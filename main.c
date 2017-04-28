@@ -457,7 +457,7 @@ fclose(f);
 if( strcmp(header, "yes") == 0 && strcmp(do_bispectrum, "yes") == 0)
 {
 f=fopen(name_bs_out,"w");
-if(f==NULL){printf("Could not write %s\n. Exiting now...\n",name_ps_out);return 0;}
+if(f==NULL){printf("Could not write %s\n. Exiting now...\n",name_bs_out);return 0;}
 fprintf(f,"#Data file %s\n",name_data_in);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Random file %s\n",name_randoms_in);}
 fprintf(f,"#Number of data elements used: %d\n",Ndata2);
@@ -486,7 +486,7 @@ if(strcmp(triangle_shapes, "SQU") == 0){fprintf(f,"Shapes of the triangles: sque
 if(strcmp(triangle_shapes, "ALL") == 0){fprintf(f,"Shapes of the triangles: all\n");}
 fclose(f);
 }
-
+//return 0;
 //Start Power Spectrum Computation for Cutsky
 printf("== Computing the Power Spectrum ==\n");
 
@@ -550,9 +550,6 @@ return 0;
 
 printf("== Computing the Bispectrum ==\n");
 
-f=fopen(name_bs_out,"w");
-if(f==NULL){printf("Could not write %s\n. Exiting now...\n",name_bs_out);return 0;}
-fclose(f);
 if(strcmp(type_of_computation, "FFT") == 0 && strcmp(type_of_survey, "cutsky") == 0)
 {
 //write bispectrum header for cutsky

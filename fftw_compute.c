@@ -2137,9 +2137,9 @@ printf("Ok!\n");
 }//end of itteration loop
 free(kx);
 
-printf("Writing Power Spectrum output %s...",name_ps_out);
+//printf("Writing Power Spectrum output %s...",name_ps_out);
 P_shot_noise=pow(L2-L1,3)/Ndata;
-
+/*
 f=fopen(name_ps_out,"a");
 fprintf(f,"#Number of data elements used: %d\n",Ndata);
 fprintf(f,"#Shot noise factor %lf\n",Shot_noise_factor);
@@ -2150,6 +2150,7 @@ fprintf(f,"#Type of Mass Assigment: %s\n",type_of_mass_assigment);
 fprintf(f,"#Number of Interlacing steps: %d\n",Ninterlacing);
 fprintf(f,"#Grid Correction: %s\n",grid_correction_string);
 fclose(f);
+*/
 write_power_spectrum_periodic(kmin,kmax,deltak_re,deltak_im,bin_ps, ngrid,L1,L2,Ninterlacing,name_ps_out,P_shot_noise,binning_type);
 
 printf("Ok!\n");
