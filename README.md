@@ -16,7 +16,7 @@ icc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positi
 
 #Type of Box (periodic/cutsky): 'periodic' for periodic boxes with boundary conditions. 'cutsky' for actual observations or mocks which include sky mask
 
-#Type of file (ascii/gadget): 'ascii' is the option required for 'cutsky'. 'periodic' option allows 'ascii' files or 'gadget' files. See 'ascii file structure' below for the format of the file
+#Type of file (ascii/gadget): 'ascii' is the option required for 'cutsky'. 'periodic' option allows 'ascii' files or 'gadget' files. Gadget units assumed kpc/h. See 'ascii file structure' below for the format of the file
 
 #Number of gadget files(int): In case the gadget boxes are split in more than 1 gadget file
 
@@ -26,7 +26,9 @@ icc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positi
 
 #Type of Computation (DSE/DSY/FFT): Type of Computation for the Power Spectrum: Direct Sum Exact (DSE); Direct Sum Yamamoto (DSY); Fast Fourier Transform (FFT). For the bispectrum computation FFT is required.
 
-#Binning for the Power Spectrum (linear/log10):
+#Binning for the Power Spectrum (linear/log10): Binning type for the power spectrum output. Linear or 10-base logarithmic. 
+
+#Size of the bin for the power spectrum (double). Size of the bin for the power spectrum. 
 
 ====Ascii File Structure=====
 
@@ -58,10 +60,24 @@ For example
 #randoms. 6-column entry:
 Right Ascension (double), declination (double), redshift (double), weight_fkp (double), number_density (double), veto (int)
 For example
+1.350240900000e+02 4.260718600000e+01 6.651101708412e-01 3.819904327393e-01 8.089333060371e-03 1
+1.849009090000e+02 5.155070000000e+01 4.627352356911e-01 1.447689384222e-01 2.953779556923e-02 1
+2.178783680000e+02 1.166351500000e+01 4.882844388485e-01 1.163647100329e-01 3.796835353765e-02 1
+1.413639550000e+02 5.575799200000e+01 5.019413828850e-01 1.094641387463e-01 4.067705969521e-02 0
+2.276985360000e+02 1.560757100000e+01 5.646098852158e-01 1.411796659231e-01 3.041586507737e-02 1
 
+====Output Structure====
+The power spectrum output have the following format:
+k-eff, k-centerbin, Monopole-Pshotnoise, Quadrupole, Hexadecapole, number of modes, Pshotnoise
+
+The bispectrum output have the following format:
+k1-eff, k1-centerbin, k2-eff, k2-centerbin, k3-eff, k3-centerbin, B0-Bshotnoise, Bshotnoise, Reduced Bispectrum Reduced Bispectrum shot noise, number of triangles
+
+For the skycut option, the code automatically generates two extra file for the number density of objects as a function of redshift for the data and random files,
 
 
 ====Citation====
-If you use this code for your published or unpublished work, please refer it to Gil-Marin, Hector in prep. 
+If you use this code for your published or unpublished work, please refer it to Gil-Marin, Hector in prep. 2017
+
 ====Disclaimer====
 blah blah blah
