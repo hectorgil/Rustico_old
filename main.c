@@ -231,48 +231,48 @@ fclose(f);
 
 
 //Error conditions
-if(strcmp(type_of_file, "gadget") != 0 && strcmp(type_of_file, "ascii") != 0){return 0;}
-if( strcmp(type_of_survey, "cutsky") != 0 && strcmp(type_of_survey, "periodic") != 0){return 0;}
+if(strcmp(type_of_file, "gadget") != 0 && strcmp(type_of_file, "ascii") != 0){printf("File type must be either 'gadget' or 'ascii'. Entry read %s. Exiting now...\n",type_of_file);return 0;}
+if( strcmp(type_of_survey, "cutsky") != 0 && strcmp(type_of_survey, "periodic") != 0){printf("Survey type must be either 'cutsky' or 'periodic'. Entry read %s. Exiting now...\n",type_of_survey);return 0;}
 if( strcmp(type_of_survey, "cutsky") == 0 && strcmp(type_of_file, "gadget") == 0 ){printf("Warning. Cutsky+gadget option not available. Exiting now...\n");return 0;}
-if(gadget_files<1){return 0;}
-if( strcmp(RSD, "yes") != 0 && strcmp(RSD, "no") != 0 ){return 0;}
+if(gadget_files<1){printf("Warning. gadget files entry must be >0. Entered value %d. Exiting now...\n",gadget_files);return 0;}
+if( strcmp(RSD, "yes") != 0 && strcmp(RSD, "no") != 0 ){printf("Warning. RSD option only accepts either 'yes' or 'no' entries. Entry read %s. Exiting now...\n",RSD);return 0;}
 if(L2<=L1){printf("Error: L2 parameter has to be large then L1. Exiting now...\n");return 0;}
-if( strcmp(type_of_computation, "DSE") !=0 &&  strcmp(type_of_computation, "DSY") !=0 &&  strcmp(type_of_computation, "FFT") !=0){return 0;}
-if( strcmp(type_of_computation, "FFT") !=0 && strcmp(do_bispectrum, "yes") ==0){return 0;}
-if( strcmp(binning_type, "log10") !=0 && strcmp(binning_type, "linear") !=0){return 0;}
-if( strcmp(binning_type, "log10") ==0 && strcmp(do_bispectrum, "yes") ==0){return 0;}
-if(bin_ps<=0){printf("Error: Size of the power spectrum bin has to be greater than 0: %lf. Exiting now...\n",bin_ps);return 0;}
+if( strcmp(type_of_computation, "DSE") !=0 &&  strcmp(type_of_computation, "DSY") !=0 &&  strcmp(type_of_computation, "FFT") !=0){printf("Type of computation only accepts 'DSE', 'DSY' or 'FFT' options. Entry read %s. Exiting now...\n",type_of_computation);return 0;}
+if( strcmp(type_of_computation, "FFT") !=0 && strcmp(do_bispectrum, "yes") ==0){printf("Warning. Bispectrum computation only accepts FFT computation option. Entry read %s. Exiting now...\n",do_bispectrum);return 0;}
+if( strcmp(binning_type, "log10") !=0 && strcmp(binning_type, "linear") !=0){printf("Warning. Binning type must be either 'log10' or 'linear'. Entry read %s. Exiting now...\n",binning_type);return 0;}
+if( strcmp(binning_type, "log10") ==0 && strcmp(do_bispectrum, "yes") ==0){printf("Warning. 'log10' type of binning not available for bispectrum computation on this version. Exiting now...\n"); return 0;}
+if(bin_ps<=0){printf("Error: Size of the power spectrum bin has to be greater than 0: Entry read %lf. Exiting now...\n",bin_ps);return 0;}
 if(kmin<0 || kmax<=0 || kmin>kmax){printf("Warning: Unusual values for maximum and/or minimum k-values for the bispectrum computation: kmin=%lf, kmax=%lf. Exiting now...\n",kmin, kmax);return 0;}
 if(kmin==0 && strcmp(binning_type, "log10") == 0){printf("Cannot set kmin=0 and log-k binning. Exiting now...\n");return 0;}
-if( strcmp(do_bispectrum, "yes") != 0 && strcmp(do_bispectrum, "no") != 0){return 0;}
-if( strcmp(do_multigrid, "yes") != 0 && strcmp(do_multigrid, "no") != 0){return 0;}
-if( strcmp(do_multigrid, "yes") == 0 && Ninterlacing<2 ){return 0;}
-if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"NGC") ==0 ){return 0;}
-if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"CIC") ==0 ){return 0;}
-if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"TSC") ==0 ){return 0;}
-if( strcmp(triangle_shapes,"ALL") !=0 && strcmp(triangle_shapes,"EQU") !=0 && strcmp(triangle_shapes,"ISO") !=0 && strcmp(triangle_shapes,"SQU") !=0 ){return 0;}
+if( strcmp(do_bispectrum, "yes") != 0 && strcmp(do_bispectrum, "no") != 0){printf("Error. Bispectrum entry must be either 'yes' or 'no'. Read entry %s. Exiting now...\n",do_bispectrum);return 0;}
+if( strcmp(do_multigrid, "yes") != 0 && strcmp(do_multigrid, "no") != 0){printf("Error. Multigrid entry must be either 'yes' or 'no'. Read entry %s. Exiting now...\n",do_multigrid);return 0;}
+if( strcmp(do_multigrid, "yes") == 0 && Ninterlacing<2 ){printf("Warning. Multigrid option requires a number of interlacing steps >1. Exiting now...\n");return 0;}
+if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"NGC") ==0 ){printf("Warning. Multigrid option requires a mass interpolation grid of at least PCS. Exiting now...\n");return 0;}
+if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"CIC") ==0 ){printf("Warning. Multigrid option requires a mass interpolation grid of at least PCS. Exiting now...\n");return 0;}
+if( strcmp(do_multigrid, "yes") == 0 && strcmp(type_of_mass_assigment,"TSC") ==0 ){printf("Warning. Multigrid option requires a mass interpolation grid of at least PCS. Exiting now...\n");return 0;}
+if( strcmp(triangle_shapes,"ALL") !=0 && strcmp(triangle_shapes,"EQU") !=0 && strcmp(triangle_shapes,"ISO") !=0 && strcmp(triangle_shapes,"SQU") !=0 ){printf("Error. Triangle shapes entry only accepts 'ALL', 'ISO', 'EQU' or 'SQU'. Read entry %s. Exiting now...\n",triangle_shapes);return 0;}
 if(Deltakbis<=0){printf("Error: Size of the bispectrum bin has to be greater than 0: %lf kf. Exiting now...\n",Deltakbis);return 0;}
-if( strcmp(triangles_num, "FFT") != 0 && strcmp(triangles_num, "APR_SUM") !=0 && strcmp(triangles_num, "EXA_SUM") !=0  && strcmp(triangles_num, "APR_EFF") !=0 && strcmp(triangles_num, "EXA_EFF") !=0){return 0;}
-if( strcmp(triangles_num, "EXA_SUM") == 0 &&  strcmp(triangle_shapes,"EQU") !=0){return 0;}//not available at the moment
-if( strcmp(triangles_num, "EXA_EFF") == 0 &&  strcmp(triangle_shapes,"EQU") !=0){return 0;}//not available at the moment
-if( strcmp(write_triangles, "yes") != 0 &&  strcmp(write_triangles, "no") !=0){return 0;}
-if( strcmp(write_triangles, "yes") == 0 && strcmp(triangle_shapes,"SQU") !=0){return 0;}
-if( strcmp(header, "yes") !=0 && strcmp(header, "no") !=0){return 0;}
+if( strcmp(triangles_num, "FFT") != 0 && strcmp(triangles_num, "APR_SUM") !=0 && strcmp(triangles_num, "EXA_SUM") !=0  && strcmp(triangles_num, "APR_EFF") !=0 && strcmp(triangles_num, "EXA_EFF") !=0){printf("Error. Number of Triangles normalization option only accepts: 'FFT', 'APR_SUM', 'EXA_SUM', 'APR_EFF', 'EXA_EFF'. Entry read %s. Exiting now...\n",triangles_num);return 0;}
+if( strcmp(triangles_num, "EXA_SUM") == 0 &&  strcmp(triangle_shapes,"EQU") !=0){printf("Warning. 'EXA_SUM' triangle normalization option it is only available for equilateral triangles. Exiting now...\n");return 0;}//not available at the moment
+if( strcmp(triangles_num, "EXA_EFF") == 0 &&  strcmp(triangle_shapes,"EQU") !=0){printf("Warning. 'EXA_EFF' triangle normalization option it is only available for equilateral triangles. Exiting now...\n");return 0;}//not available at the moment
+if( strcmp(write_triangles, "yes") != 0 &&  strcmp(write_triangles, "no") !=0){printf("Error. write triangle entry must be either 'yes' or 'now'. Exiting now...\n");return 0;}
+if( strcmp(write_triangles, "yes") == 0 && strcmp(triangle_shapes,"SQU") !=0){printf("Waring. Write triangle option 'yes' is only recomended for squeezed triangle shapes 'SQU'. Exiting now...\n");return 0;}
+if( strcmp(header, "yes") !=0 && strcmp(header, "no") !=0){printf("Waring. Write header option must be either 'yes' or 'no'. Entry read %s. Exiting now...\n",header);return 0;}
 if(power_grid<4 || power_grid>15){printf("Warning: Unusual value for number of grid cells per side: 2^%d=%ld. Exiting now...\n",power_grid,ngrid);return 0;}
-if(strcmp(type_of_mass_assigment,"NGC") !=0 && strcmp(type_of_mass_assigment,"CIC") !=0 && strcmp(type_of_mass_assigment,"TSC") !=0 && strcmp(type_of_mass_assigment,"PCS") !=0 && strcmp(type_of_mass_assigment,"P4S") !=0 &&  strcmp(type_of_mass_assigment,"P5S") !=0){return 0;}
-if( strcmp(type_of_yamamoto, "GridCenter") != 0 && strcmp(type_of_yamamoto, "GridAverage") != 0){return 0;}
+if(strcmp(type_of_mass_assigment,"NGC") !=0 && strcmp(type_of_mass_assigment,"CIC") !=0 && strcmp(type_of_mass_assigment,"TSC") !=0 && strcmp(type_of_mass_assigment,"PCS") !=0 && strcmp(type_of_mass_assigment,"P4S") !=0 &&  strcmp(type_of_mass_assigment,"P5S") !=0){printf("Error. Type of mass assigment must be either 'NGC', 'CIC', 'TSC', 'PCS', 'P4S' or 'P5S'. Entry read %s. Exiting now...\n",type_of_mass_assigment);return 0;}
+if( strcmp(type_of_yamamoto, "GridCenter") != 0 && strcmp(type_of_yamamoto, "GridAverage") != 0){printf("Error. Type of Yamamoto option must be either 'GridCenter' or 'GridAverage'. Entry read %s. Exiting now...\n",type_of_yamamoto);return 0;}
 if(Ninterlacing<=0){printf("Error: Number of interglacing steps has to be equal or larger than 1. %d\n",Ninterlacing);return 0;}
-if( strcmp(grid_correction_string, "yes") !=0 && strcmp(grid_correction_string, "no") !=0){return 0;}
+if( strcmp(grid_correction_string, "yes") !=0 && strcmp(grid_correction_string, "no") !=0){printf("Grid correction input must be either 'yes' or 'no'. Entry read %s. Exiting now...\n",grid_correction_string);return 0;}
 
 if(strcmp(type_of_survey, "cutsky") == 0){
 if(z_min>=z_max){printf("Error. Minimum value for redshift is larger than the maximum: z_min=%lf; z_max=%lf. Exiting now...\n",z_min,z_max);return 0;}
 if(Omega_m<=0 || Omega_m>1){printf("Warning. Unusual value for Omega_m, Omega_m=%lf. Exiting now...\n",Omega_m);return 0;}
 if(Area_survey<=0){printf("Warning. Usual value for the Area of the survey: %lf. Exiting now...\n",Area_survey);return 0;}
-if( strcmp(Hexadecapole_type, "L4") !=0 && strcmp(Hexadecapole_type, "L2L2") !=0){return 0;}
-if( strcmp(type_normalization_mode, "area") !=0 && strcmp(type_normalization_mode, "density") !=0){return 0;}
-if( strcmp(type_normalization_mode2, "data") !=0 && strcmp(type_normalization_mode2, "randoms") !=0){return 0;}
+if( strcmp(Hexadecapole_type, "L4") !=0 && strcmp(Hexadecapole_type, "L2L2") !=0){printf("Hexadecapole option must be either 'L2L2' or 'L4'. Entry read %s. Exiting now...\n",Hexadecapole_type);return 0;}
+if( strcmp(type_normalization_mode, "area") !=0 && strcmp(type_normalization_mode, "density") !=0){printf("Error. Normalisation type must be either 'area' or 'density'. Entry read %s. Exiting now...\n",type_normalization_mode);return 0;}
+if( strcmp(type_normalization_mode2, "data") !=0 && strcmp(type_normalization_mode2, "randoms") !=0){printf("Error. Normalisation type must be either 'data' or 'randoms'. Entry read %s. Exiting now...\n",type_normalization_mode2);return 0;}
 if(Shot_noise_factor>1 || Shot_noise_factor<0){printf("Warning. Usual value for the Shot noise factor: %lf. Exiting now...\n",Shot_noise_factor);return 0;}
-if( strcmp(do_bispectrum, "yes") == 0 && strcmp(type_normalization_mode, "density") == 0 ){printf("Warning. Bispectrum computation requires a normalization by area and not by density. Exiting now...\n");return 0;}
+if( strcmp(do_bispectrum, "yes") == 0 && strcmp(type_normalization_mode, "density") == 0 ){printf("Warning. Bispectrum computation requires a normalization by 'area' and not by 'density'. Exiting now...\n");return 0;}
 }
 //etc strings.....
 
@@ -479,11 +479,11 @@ if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of Interlacing st
 if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Grid Correction: %s\n",grid_correction_string);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Value of Om=%lf\n",Omega_m);}
 if(strcmp(type_of_file, "gadget") == 0){fprintf(f,"#RSD: %s\n",RSD); }
-fprintf(f,"Computation using multigrid: %s\n",do_multigrid);
-if(strcmp(triangle_shapes, "EQU") == 0){fprintf(f,"Shapes of the triangles: equilateral\n");}
-if(strcmp(triangle_shapes, "ISO") == 0){fprintf(f,"Shapes of the triangles: isosceles\n");}
-if(strcmp(triangle_shapes, "SQU") == 0){fprintf(f,"Shapes of the triangles: squeezed\n");}
-if(strcmp(triangle_shapes, "ALL") == 0){fprintf(f,"Shapes of the triangles: all\n");}
+fprintf(f,"#Computation using multigrid: %s\n",do_multigrid);
+if(strcmp(triangle_shapes, "EQU") == 0){fprintf(f,"#Shapes of the triangles: equilateral\n");}
+if(strcmp(triangle_shapes, "ISO") == 0){fprintf(f,"#Shapes of the triangles: isosceles\n");}
+if(strcmp(triangle_shapes, "SQU") == 0){fprintf(f,"#Shapes of the triangles: squeezed\n");}
+if(strcmp(triangle_shapes, "ALL") == 0){fprintf(f,"#Shapes of the triangles: all\n");}
 fclose(f);
 }
 //return 0;
