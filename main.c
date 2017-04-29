@@ -449,7 +449,7 @@ if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Grid Correction: %s\n",g
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Value of Om=%lf\n",Omega_m);}
 if(strcmp(type_of_file, "gadget") == 0){fprintf(f,"#RSD: %s\n",RSD); }
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Hexadecapole as %s\n",Hexadecapole_type);}
-
+fprintf(f,"#k-centerbin\t k-eff\t Monopole-Pshotnoise\t Quadrupole\t Hexadecapole\t number of modes\t Pshotnoise\n");
 }
 fclose(f);
 
@@ -484,9 +484,11 @@ if(strcmp(triangle_shapes, "EQU") == 0){fprintf(f,"#Shapes of the triangles: equ
 if(strcmp(triangle_shapes, "ISO") == 0){fprintf(f,"#Shapes of the triangles: isosceles\n");}
 if(strcmp(triangle_shapes, "SQU") == 0){fprintf(f,"#Shapes of the triangles: squeezed\n");}
 if(strcmp(triangle_shapes, "ALL") == 0){fprintf(f,"#Shapes of the triangles: all\n");}
+fprintf(f,"#k1-centerbin\t k1-eff\t k2-centerbin\t k2-eff\t k3-centerbin\t k3-eff\t Bispectrum-Bshotnoise\t Bsn\t Q-Qsn\t Qsn\t Number of Triangles\n");
+
 fclose(f);
 }
-//return 0;
+
 //Start Power Spectrum Computation for Cutsky
 printf("== Computing the Power Spectrum ==\n");
 

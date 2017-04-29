@@ -402,7 +402,7 @@ FILE *f,*ftriangles;
 long int ngridr2c,ngridtot;
 double Pi=4.*atan(1.0);
 double kf,kth;
-double B;
+double B,Q;
 
 long int lines_temp_file;
 int tid;
@@ -416,7 +416,7 @@ long int N_eff1,N_eff2,N_eff3;
 long int N_eff1_unique,N_eff2_unique,N_eff3_unique;
 double ijk;
 double ki;
-double B_shot_noise;
+double B_shot_noise,Q_shot_noise;
 long int line_test;
 double Number_triangles;
 double *out_k1,*out_k2,*out_k3;
@@ -716,8 +716,10 @@ P3=P3/N_eff3-Psn;
 
 B_shot_noise=IN*( P1 + P2 + P3 )+Bsn;
 B=B-B_shot_noise;
+Q_shot_noise=B_shot_noise/(P1*P2+P1*P3+P2*P3);
+Q=B/(P1*P2+P1*P3+P2*P3);
 
-fprintf(f,"%lf %lf %lf %lf %lf %lf %lf %lf %lf\n",K1[i1], K_eff1, K2[i1][i2], K_eff2, K3[i1][i2][i3], K_eff3,B, B_shot_noise, Number_triangles);
+fprintf(f,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",K_eff1, K1[i1], K_eff2,  K2[i1][i2], K_eff3, K3[i1][i2][i3],B, B_shot_noise,Q,Q_shot_noise, Number_triangles);
 bin++;
 
 
