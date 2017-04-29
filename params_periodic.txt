@@ -1,0 +1,42 @@
+#Main parameters
+#Type of Box (periodic/cutsky): periodic
+#Type of file (ascii/gadget): gadget
+#Number of gadget files: 16
+#RSD distorsion on gadget periodic box (yes/no): yes
+#Size of the Box (double/double): 0.0 +2400.0
+#Type of Computation (DS/FFT): FFT
+#Binning for the Power Spectrum (linear/log10): linear
+#Size of the bin for the power spectrum (double): 0.01
+#k-range for computation (double/double): 0 0.6
+
+#Bispectrum parameters
+#Do Bispectrum (yes/no): yes
+#Do Multigrid (yes/no): no
+#Triangle Shapes (ALL/EQU/ISO/SQU): ALL
+#Size of the bin for the bispectrum (double):  0.015
+#Normalization of triangles(FFT/APR_SUM/APR_EFF,EXA_EFF): FFT
+#Write triangles in each bin(yes/no): no
+#Path for triangles in each bin: ./power_spectra/triangles
+
+#Read inout parameters
+#Path of data: /mnt/lustre/hectorgm/Dark_matter_CW_sims/1/snapshot_004
+#Path of randoms: nothing
+#Path of output: ./power_spectra
+#Identifier of output: periodicbox
+#Write header: yes
+
+#FFT parameters
+#Number of Grid Cells power (int): 9
+#Type of mass assingment (NGC/CIC/TSC/PCS/P4S/P5S): P5S
+#Type of Yamamoto (GridCenter/GridAverage): GridCenter
+#Number of interlacing steps (int): 2
+#Do Grid Correction? (yes/no): yes
+
+#Cutsky parameters
+#Redshift Range (double/double): 0.8 2.2
+#Omega matter value (double): 0.31
+#Area effective value in deg^2 (double): 1001.2525
+#Hexadecapole as (L4/L2L2): L2L2
+#Compute Normalization as (area/density): area
+#Compute Normalization using (randoms/data): data
+#Compute Shot noise as (double): 1.0

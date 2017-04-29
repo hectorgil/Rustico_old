@@ -1,0 +1,42 @@
+#Main parameters
+#Type of Box (periodic/cutsky): cutsky
+#Type of file (ascii/gadget): ascii
+#Number of gadget files: 1
+#RSD distorsion on gadget periodic box (yes/no): yes
+#Size of the Box (double/double): -1800.0 +1700.0
+#Type of Computation (DSE/DSY/FFT): FFT
+#Binning for the Power Spectrum (linear/log10): linear
+#Size of the bin for the power spectrum (double): 0.01
+#k-range for computation (double/double): 0 0.60
+
+#Bispectrum parameters
+#Do Bispectrum (yes/no): yes
+#Do Multigrid (yes/no): yes
+#Triangle Shapes (ALL/EQU/ISO/SQU): ALL
+#Size of the bin for the bispectrum (int): 0.02
+#Normalization of triangles(FFT/APR_SUM/APR_EFF,EXA_EFF): FFT
+#Write triangles in each bin(yes/no): no
+#Path for triangles in each bin: ./power_spectra/triangles
+
+#Read inout parameters
+#Path of data: /mnt/lustre/hectorgm/DR12_boss_public/boss_cmass_galaxies_ngc.txt
+#Path of randoms: /mnt/lustre/hectorgm/DR12_boss_public/boss_cmass_randoms_ngc.txt
+#Path of output: ./power_spectra
+#Identifier of output: boss_data
+#Write header: yes
+
+#FFT parameters
+#Number of Grid Cells power (int): 10
+#Type of mass assingment (NGC/CIC/TSC/PCS/P4S/P5S): P5S
+#Type of Yamamoto (GridCenter/GridAverage): GridCenter
+#Number of interlacing steps (int): 2
+#Do Grid Correction? (yes/no): yes
+
+#Cutsky parameters
+#Redshift Range (double/double): 0.43 0.70
+#Omega matter value (double): 0.31
+#Area effective value in deg^2 (double): 6851.41382086
+#Hexadecapole as (L4/L2L2): L2L2
+#Compute Normalization as (area/density): area
+#Compute Normalization using (randoms/data): data
+#Compute Shot noise as (double): 1.0
