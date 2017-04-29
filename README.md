@@ -28,7 +28,18 @@ icc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positi
 
 #Binning for the Power Spectrum (linear/log10): Binning type for the power spectrum output. Linear or 10-base logarithmic. 
 
-#Size of the bin for the power spectrum (double). Size of the bin for the power spectrum. 
+#Size of the bin for the power spectrum (double). Size of the bin for the power spectrum. In case log10 is choosen as binning, the interval is provided in log10-scale.
+
+#k-range for computation (double/double): Low and Upper limits, respectively, of the k-values choosen for printing the power spectrum.
+
+#Do Bispectrum (yes/no): Whether the bispectrum should be computed by the code
+
+Do Multigrid (yes/no): Option for the bispectrum computation. If enable, the bispectrum triangles will be split according to their k-values and associated to different grid-sizes for a more optimal computation (large scale modes do not requires small grid cell ressolution). However, each grid-size computation will requires to re-associate the particles to the grid cells, which a potential lose of optimality. We recomend enable such option when many triangle shapes are required and when the datasets do not consists of many particles. In practice, each specific case will requires testing for determing the best performance option. When the multigrid option is enable, we require the interlacing option to be also enabled (see below), with at least 2 interlacing steps.
+
+#Triangle Shapes (ALL/EQU/ISO/SQU). Triangle shapes to be computed. All (ALL), equilateral (EQU), Isosceles (ISO), squeezed (SQU). We define the squeezed triangles as those |k2-k3|<=k1 and K1<=0.1 K2; where by definition K1<=K2<=K3. Note that this condition is applied to the center of bin k-values and not to the effective k-values.
+
+#Normalization of triangles(FFT/APR_SUM/APR_EFF,EXA_EFF):
+
 
 ====Ascii File Structure=====
 
@@ -71,10 +82,19 @@ The power spectrum output have the following format:
 k-eff, k-centerbin, Monopole-Pshotnoise, Quadrupole, Hexadecapole, number of modes, Pshotnoise
 
 The bispectrum output have the following format:
-k1-eff, k1-centerbin, k2-eff, k2-centerbin, k3-eff, k3-centerbin, B0-Bshotnoise, Bshotnoise, Reduced Bispectrum Reduced Bispectrum shot noise, number of triangles
+k1-eff, k1-centerbin, k2-eff, k2-centerbin, k3-eff, k3-centerbin, B0-Bshotnoise, Bshotnoise, Reduced Bispectrum, Reduced Bispectrum shot noise, number of triangles
 
-For the skycut option, the code automatically generates two extra file for the number density of objects as a function of redshift for the data and random files,
+For the skycut option, the code automatically generates two extra file for the number density of objects as a function of redshift for the data and random files with the following format,
 
+#data
+#Interval: xxx Mpc/h
+# z <nobs> <wc nobs> <wc wfkp nobs>
+
+#random
+#Interval: yyy  Mpc/h
+# alpha<ns> alpha<wfkp ns>
+
+where xxx and yyy are the interval choosen by the code to bin the data and randoms, respectively, <nobs> are the raw number density of observed objects, <wc nobs> is the number density of observed objects weighted by the collision weights, and <wc wfkp nobs> weighted by the collision weights and fkp weights. For the randoms, these number densities are scaled by alpha in order to match the data ones. 
 
 ====Citation====
 If you use this code for your published or unpublished work, please refer it to Gil-Marin, Hector in prep. 2017
