@@ -55,7 +55,7 @@ int load_snapshot(char *fname, int files, double *params)
                 if(!(fd=fopen(buf,"r")))
                 {
                         printf("can't open file `%s`\n",buf);
-                        exit(0);
+                        exit(EXIT_FAILURE);
                 }
 
 
@@ -98,7 +98,7 @@ int load_snapshot(char *fname, int files, double *params)
         if(!(P=malloc(NumPart*sizeof(struct particle_data))))
     {
                 fprintf(stderr,"failed to allocate memory.\n");
-                exit(0);
+                exit(EXIT_FAILURE);
     }
 
 
@@ -158,7 +158,7 @@ long int count_particles_gadget(char *name_data_in)
          int NumPart,Ngas;
 
         fd=fopen(name_data_in,"r");
-
+        if(fd==NULL){printf("Error reading %s file. Exiting now...\n",name_data_in);exit(EXIT_FAILURE);}
                 fread(&dummy, sizeof(dummy), 1, fd);
                 fread(&header1, sizeof(header1), 1, fd);
                 fread(&dummy, sizeof(dummy), 1, fd);
@@ -907,7 +907,6 @@ void fftw_yamamoto_skycut(int mode_yamamoto, double in[], double deltak_re[], do
   double cx,cy,cz;
   double *kx;
   double Pi=(4.*atan(1.));
- // long int ngridtot=pow(ngrid,3);
   long int ngridtotr2c=(pow(ngrid,3)/2+pow(ngrid,2));//N*N*(N/2+1)
 
   long int index2;
@@ -939,10 +938,6 @@ i=(int)(index2/(ngrid*ngrid/2+ngrid));
 j=(int)( (index2-i*(ngrid*ngrid/2+ngrid))/(ngrid/2+1) );
 k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
 
-//        i=(int)(c/(ngrid*ngrid*1.));
-//        j=(int)( (c-i*ngrid*ngrid)/(ngrid*1.));
-//        k=c-i*ngrid*ngrid-j*ngrid;
-//        index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
         cx=sin( kx[i]*Pi/(2.*kx[ngrid/2]) )/( kx[i]*Pi/(2.*kx[ngrid/2]) );
         cy=sin( kx[j]*Pi/(2.*kx[ngrid/2]) )/( kx[j]*Pi/(2.*kx[ngrid/2]) );
         cz=sin( kx[k]*Pi/(2.*kx[ngrid/2]) )/( kx[k]*Pi/(2.*kx[ngrid/2]) );
@@ -950,8 +945,6 @@ k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
         if(kx[j]==0 || mode_mass_ass==0){cy=1.;}
         if(kx[k]==0 || mode_mass_ass==0){cz=1.;}
 
-  //      if(kx[k]>=0 && kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k]>0)
-    //    {
 
 if(mode_yamamoto==0){
           deltak_re[index2]=creal(out[index2])*pow(cx*cy*cz,-mode_mass_ass*1.);
@@ -1041,7 +1034,6 @@ if(mode_yamamoto==21){
 deltak_re[index2]+=12.*(creal(out[index2])*pow(kx[k],2))*kx[j]*kx[i]*pow(cx*cy*cz,-mode_mass_ass*1.)*pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],-2);
 deltak_im[index2]+=12.*(cimag(out[index2])*pow(kx[k],2))*kx[j]*kx[i]*pow(cx*cy*cz,-mode_mass_ass*1.)*pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],-2);
 }
-//      }
 
 
 }
@@ -1049,7 +1041,7 @@ deltak_im[index2]+=12.*(cimag(out[index2])*pow(kx[k],2))*kx[j]*kx[i]*pow(cx*cy*c
    
     fftw_free(out);
     free(kx);
-
+fftw_cleanup();
 //in not modified
 //deltak_re filled
 //deltak_im filled
@@ -1144,13 +1136,7 @@ for(index2=0;index2<ngridtotr2c;index2++)
 i=(int)(index2/(ngrid*ngrid/2+ngrid));
 j=(int)( (index2-i*(ngrid*ngrid/2+ngrid))/(ngrid/2+1) );
 k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
-//i=(int)(c/(ngrid*ngrid*1.));
-//j=(int)( (c-i*ngrid*ngrid)/(ngrid*1.));
-//k=c-i*ngrid*ngrid-j*ngrid;
-//index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
 Sk=kx[i]+ kx[j]+ kx[k];
-//if(kx[k]>=0)
-//{
 
 phase_cos=cos(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*Sk);
 phase_sin=sin(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*Sk);
@@ -1162,7 +1148,6 @@ deltak_re0[index2]+=new_deltak_re0_b;
 deltak_im0[index2]+=new_deltak_im0_b;
 
 
-//}
 }
 
         free(deltak_re0_b);
@@ -1326,14 +1311,7 @@ i=(int)(index2/(ngrid*ngrid/2+ngrid));
 j=(int)( (index2-i*(ngrid*ngrid/2+ngrid))/(ngrid/2+1) );
 k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
 
-////i=(int)(c/(ngrid*ngrid*1.));
-////j=(int)( (c-i*ngrid*ngrid)/(ngrid*1.));
-////k=c-i*ngrid*ngrid-j*ngrid;
-////index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
 Sk=kx[i]+ kx[j]+ kx[k];
-
-////if(kx[k]>=0)
-////{
 
 phase_cos=cos(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*Sk);
 phase_sin=sin(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*Sk);
@@ -1360,7 +1338,6 @@ deltak_re4[index2]+=new_deltak_re4_b;
 deltak_im4[index2]+=new_deltak_im4_b;
 }
 
-////}
 }
 
         free(deltak_re0_b);
@@ -1699,12 +1676,6 @@ i=(int)(index2/(ngrid*ngrid/2+ngrid));
 j=(int)( (index2-i*(ngrid*ngrid/2+ngrid))/(ngrid/2+1) );
 k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
 
-//i=(int)(c/(ngrid*ngrid*1.));
-//j=(int)( (c-i*ngrid*ngrid)/(ngrid*1.));
-//k=c-i*ngrid*ngrid-j*ngrid;
-//index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
-//if(kx[k]>=0)
-//{
 
 phase_cos=cos(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*(kx[i]+ kx[j]+ kx[k]));
 phase_sin=sin(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*(kx[i]+ kx[j]+ kx[k]));
@@ -1731,7 +1702,7 @@ deltak_re4[index2]+=new_deltak_re4_b;
 deltak_im4[index2]+=new_deltak_im4_b;
 }
 
-//}
+
 }
 
         free(deltak_re0_b);
@@ -1952,19 +1923,14 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
             i=(int)(index2/(ngrid*ngrid/2+ngrid));
             j=(int)( (index2-i*(ngrid*ngrid/2+ngrid))/(ngrid/2+1) );
             k=index2-i*(ngrid*ngrid/2+ngrid)-j*(ngrid/2+1);
-//          i=(int)(c/(ngrid*ngrid*1.));
-//          j=(int)( (c-i*ngrid*ngrid)/(ngrid*1.));
-//          k=c-i*ngrid*ngrid-j*ngrid;
-//          index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
-//          if(kx[k]>=0)
-//          {
+
              phase_cos=cos(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*(kx[i]+ kx[j]+ kx[k]));
              phase_sin=sin(((L2-L1)/ngrid*1.)*(i_inter*1.-1.)/Ninterlacing*1.*(kx[i]+ kx[j]+ kx[k]));
              new_deltak_re_b=deltak_re_b[index2]*phase_cos-deltak_im_b[index2]*phase_sin;
              new_deltak_im_b=deltak_re_b[index2]*phase_sin+deltak_im_b[index2]*phase_cos;
              deltak_re[index2]+=new_deltak_re_b;
              deltak_im[index2]+=new_deltak_im_b;
-//}
+
 }
 
         free(deltak_re_b);
@@ -2060,11 +2026,10 @@ Ndata=Ndata+NumPart_file;
  pos_y = (double*) calloc(NumPart_file, sizeof(double));
  pos_z = (double*) calloc(NumPart_file, sizeof(double));
 
-//printf("%ld %lf %lf %lf\n",NumPart_file,scale_factor,Omatter,Olambda);
      for(c=0; c<NumPart_file; c++)
      {
 
-     pos_x[c]=P[c].Pos[0]*0.001; //conversion to Mpc/h (originally in kpc/h)
+     pos_x[c]=P[c].Pos[0]*0.001;
      pos_y[c]=P[c].Pos[1]*0.001;
 if(strcmp(RSD, "no") == 0){pos_z[c]=P[c].Pos[2]*0.001;}
 if(strcmp(RSD, "yes") == 0){pos_z[c]=(P[c].Pos[2]*0.001)+(P[c].Vel[2])*sqrt(scale_factor)/(100.*scale_factor*sqrt(Omatter*pow(scale_factor,-3)+Olambda));}
@@ -2137,20 +2102,9 @@ printf("Ok!\n");
 }//end of itteration loop
 free(kx);
 
-//printf("Writing Power Spectrum output %s...",name_ps_out);
+printf("Writing Power Spectrum output %s...",name_ps_out);
 P_shot_noise=pow(L2-L1,3)/Ndata;
-/*
-f=fopen(name_ps_out,"a");
-fprintf(f,"#Number of data elements used: %d\n",Ndata);
-fprintf(f,"#Shot noise factor %lf\n",Shot_noise_factor);
-fprintf(f,"#Shot noise value %lf\n",P_shot_noise);
-fprintf(f,"#Type of Computation: FFT\n");
-fprintf(f,"#Number of k-cells: %ld\n",ngrid);
-fprintf(f,"#Type of Mass Assigment: %s\n",type_of_mass_assigment);
-fprintf(f,"#Number of Interlacing steps: %d\n",Ninterlacing);
-fprintf(f,"#Grid Correction: %s\n",grid_correction_string);
-fclose(f);
-*/
+
 write_power_spectrum_periodic(kmin,kmax,deltak_re,deltak_im,bin_ps, ngrid,L1,L2,Ninterlacing,name_ps_out,P_shot_noise,binning_type);
 
 printf("Ok!\n");

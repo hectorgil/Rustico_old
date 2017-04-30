@@ -32,7 +32,8 @@ f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
 
-fscanf(f,"%*f %*f %lf %*f %d %*f %*f %d\n",&redshift, &weight_col,&veto);//data
+fscanf(f,"%*f %*f %lf %*f %d %*f %*f\n",&redshift, &weight_col);veto=1;//data
+//fscanf(f,"%*f %*f %lf %*f %*f %*f %d\n",&redshift,&veto);weight_col=1;//EZmocks
 if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
 {
 npar_used++;
@@ -57,7 +58,9 @@ long int npar_used=0;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-        fscanf(f,"%*f %*f %lf %*f %*f %d\n",&redshift,&veto);
+        fscanf(f,"%*f %*f %lf %*f %*f\n",&redshift);veto=1;//data
+//          fscanf(f,"%*f %*f %lf %*f %*f %*f %d\n",&redshift,&veto);//EZmocks
+
 if(redshift>z_min && redshift<z_max && veto==1)
 {
 npar_used++;
@@ -114,7 +117,8 @@ Area=parameter_value[13]*pow(Pi/180.,2);
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-fscanf(f,"%*f %*f %lf %lf %d %lf %*f %d\n",&redshift, &weight_fkp, &weight_col, &weight_sys,&veto);
+fscanf(f,"%*f %*f %lf %lf %d %lf %*f\n",&redshift, &weight_fkp, &weight_col, &weight_sys);veto=1;
+//fscanf(f,"%*f %*f %lf %lf %*f %*f %d\n",&redshift,&weight_fkp,&veto);weight_col=1;weight_sys=1;//EZmocks
 
 if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
   {
@@ -251,7 +255,8 @@ DeltaR=i_DeltaR*0.5;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-fscanf(f,"%lf %lf %lf %lf %d %lf %lf %d\n", &RA, &dec, &redshift, &weight_fkp, &weight_col, &weight_sys, &n_z,&veto);
+fscanf(f,"%lf %lf %lf %lf %d %lf %lf\n", &RA, &dec, &redshift, &weight_fkp, &weight_col, &weight_sys, &n_z);veto=1;
+//fscanf(f,"%lf %lf %lf %lf %*f %lf %d\n",&RA,&dec,&redshift,&weight_fkp,&n_z,&veto);weight_col=1;weight_sys=1;//EZmocks
 
 theta=90.-dec;
 if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
@@ -454,7 +459,8 @@ npar=(int)(parameter_value[3]);
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-        fscanf(f,"%*f %*f %lf %lf %*f %d\n",&redshift, &weight_fkp,&veto);
+        fscanf(f,"%*f %*f %lf %lf %*f\n",&redshift, &weight_fkp);veto=1;
+//      fscanf(f,"%*f %*f %lf %lf %*f %*f %d\n",&redshift,&weight_fkp,&veto);//EZmocks
 
         if(redshift>z_min && redshift<z_max && veto==1)
         {
@@ -566,7 +572,8 @@ DeltaR=i_DeltaR*0.5;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-	fscanf(f,"%lf %lf %lf %lf %lf %d\n", &RA, &dec, &redshift, &weight_fkp, &n_z,&veto);
+	fscanf(f,"%lf %lf %lf %lf %lf\n", &RA, &dec, &redshift, &weight_fkp, &n_z);veto=1;
+//        fscanf(f,"%lf %lf %lf %lf %*f %lf %d\n",&RA,&dec,&redshift,&weight_fkp,&n_z,&veto);//EZmocks
 
 	theta=90.-dec;
 	if(redshift>z_min && redshift<z_max && veto==1)

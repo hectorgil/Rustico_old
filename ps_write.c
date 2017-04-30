@@ -496,10 +496,14 @@ if(bintype_sw==1){k_av[l][tid]+=pow(10,(l+0.5)*Deltak+log10(kmin));}
 if(kx[k]>=0)
 {
 index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
+
+if(index2>0){
 Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
 Quadru[l][tid]+=deltak_re0[index2]/N_interlacing*1.*0.5*(3.*deltak_re2[index2]/N_interlacing*1.-deltak_re0[index2]/N_interlacing*1.)+deltak_im0[index2]/N_interlacing*1.*0.5*(3.*deltak_im2[index2]/N_interlacing*1.-deltak_im0[index2]/N_interlacing*1.);
 Hexadeca[l][tid]+=315./8.*(pow(deltak_re2[index2]/N_interlacing*1.,2)+pow(deltak_im2[index2]/N_interlacing*1.,2))-135./4.*(deltak_re0[index2]/N_interlacing*1.*deltak_re2[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im2[index2]/N_interlacing*1.)+27./8.*(pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2));
                 nmodes[l][tid]+=1;
+}
+
 }
 else
 {
@@ -510,10 +514,12 @@ if(i2==ngrid){i2=0;}
 if(j2==ngrid){j2=0;}
 if(k2==ngrid){k2=0;}
 index2=((pow(ngrid,2)*i2+ngrid*j2+2*k2)/2+i2*ngrid+j2);
+if(index2>0){
 Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
 Quadru[l][tid]+=deltak_re0[index2]/N_interlacing*1.*0.5*(3.*deltak_re2[index2]/N_interlacing*1.-deltak_re0[index2]/N_interlacing*1.)+deltak_im0[index2]/N_interlacing*1.*0.5*(3.*deltak_im2[index2]/N_interlacing*1.-deltak_im0[index2]/N_interlacing*1.);
 Hexadeca[l][tid]+=315./8.*(pow(deltak_re2[index2]/N_interlacing*1.,2)+pow(deltak_im2[index2]/N_interlacing*1.,2))-135./4.*(deltak_re0[index2]/N_interlacing*1.*deltak_re2[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im2[index2]/N_interlacing*1.)+27./8.*(pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2));
                 nmodes[l][tid]+=1;
+}
 
 }
                }
@@ -544,6 +550,7 @@ nmodes[l][0]+=nmodes[l][tid];
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         Hexadeca[l][0]*=1.0/(nmodes[l][0]*1.*I22);
 if(k_av[l][0]>=kmin && k_av[l][0]<=kmax ){
+
                         fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
 }
                         
@@ -665,10 +672,13 @@ if(bintype_sw==1){k_av[l][tid]+=pow(10,(l+0.5)*Deltak+log10(kmin));}
 if(kx[k]>=0)
 {
 index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
+if(index2>0)
+{
 Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
 Quadru[l][tid]+=deltak_re0[index2]/N_interlacing*1.*0.5*(3.*deltak_re2[index2]/N_interlacing*1.-deltak_re0[index2]/N_interlacing*1.)+deltak_im0[index2]/N_interlacing*1.*0.5*(3.*deltak_im2[index2]/N_interlacing*1.-deltak_im0[index2]/N_interlacing*1.);
 Hexadeca[l][tid]+=315./8.*(deltak_re0[index2]/N_interlacing*1.*deltak_re4[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im4[index2]/N_interlacing*1.)-135./4.*(deltak_re0[index2]/N_interlacing*1.*deltak_re2[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im2[index2]/N_interlacing*1.)+27./8.*(pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2));
                 nmodes[l][tid]+=1;
+}
 }
 else
 {
@@ -679,9 +689,12 @@ if(i2==ngrid){i2=0;}
 if(j2==ngrid){j2=0;}
 if(k2==ngrid){k2=0;}
 index2=((pow(ngrid,2)*i2+ngrid*j2+2*k2)/2+i2*ngrid+j2);
+if(index2>0)
+{
 Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
 Quadru[l][tid]+=deltak_re0[index2]/N_interlacing*1.*0.5*(3.*deltak_re2[index2]/N_interlacing*1.-deltak_re0[index2]/N_interlacing*1.)+deltak_im0[index2]/N_interlacing*1.*0.5*(3.*deltak_im2[index2]/N_interlacing*1.-deltak_im0[index2]/N_interlacing*1.);
 Hexadeca[l][tid]+=315./8.*(deltak_re0[index2]/N_interlacing*1.*deltak_re4[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im4[index2]/N_interlacing*1.)-135./4.*(deltak_re0[index2]/N_interlacing*1.*deltak_re2[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im2[index2]/N_interlacing*1.)+27./8.*(pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2));
+}
                 nmodes[l][tid]+=1;
 
 }
@@ -848,10 +861,13 @@ if(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k]==0){argument=0;}
 if(kx[k]>=0)
 {
 index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
+if(index2>0)
+{
 Mono[l][tid]+=pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2);
 Quadru[l][tid]+=(pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2))*Leg2(argument);
 Hexadeca[l][tid]+=(pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2))*Leg4(argument);
 nmodes[l][tid]+=1;
+}
 }
 else
 {
@@ -862,11 +878,13 @@ if(i2==ngrid){i2=0;}
 if(j2==ngrid){j2=0;}
 if(k2==ngrid){k2=0;}
 index2=((pow(ngrid,2)*i2+ngrid*j2+2*k2)/2+i2*ngrid+j2);
+if(index2>0)
+{
 Mono[l][tid]+=pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2);
 Quadru[l][tid]+=(pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2))*Leg2(argument);
 Hexadeca[l][tid]+=(pow(deltak_re[index2]/Ninterlacing*1.,2)+pow(deltak_im[index2]/Ninterlacing*1.,2))*Leg4(argument);
                nmodes[l][tid]+=1;
-
+}
 }
                }
       }
