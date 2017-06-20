@@ -40,7 +40,7 @@ Do Multigrid (yes/no): Option for the bispectrum computation. If enable, the bis
 
 #Triangle Shapes (ALL/EQU/ISO/SQU). Triangle shapes to be computed. All (ALL), equilateral (EQU), Isosceles (ISO), squeezed (SQU). We define the squeezed triangles as those |k2-k3|<=k1 and K1<=0.1 K2; where by definition K1<=K2<=K3. Note that this condition is applied to the center of bin k-values and not to the effective k-values.
 
-#Size of the bin for the bispectrum (int): Size of the bispectrum bin
+#Size of the bin for the bispectrum (double): Size of the bispectrum bin
 
 #Normalization of triangles(FFT/APR_SUM/APR_EFF,EXA_EFF): This determine the way how the Bispectrum is normalized: FFT is through performing Eq. xxx of ... using Fourier Transforms; APR is using the approximate solution of Eq. xxx 8pi^2k1k2k3Dk^3 and EXA is using the full and exact analytic solution (only available for Equilateral triangles at the moment). SUM option is computing APR and EXA for each triangle shape in the k-bin, whereas EFF is computing APR and EXA only for the effective k-values in the k-bin. 
 
