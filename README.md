@@ -2,9 +2,10 @@ RUSTICO   Rapid foUrier STatIstics COde
 
 Author: Hector Gil Marin
 
-Date: 1st May 2017
+Release Date: 1st May 2017
+General update with minor bugs: 26th Oct 2018
 
-email: hector.gil.marin@gmail.com or hector.gilmarin@lpnhe.in2p3.fr
+email: hector.gil.marin@gmail.com or hectorgil@icc.ub.edu
 
 ====Compilation====
 
