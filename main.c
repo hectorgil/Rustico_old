@@ -102,7 +102,7 @@ double Shot_noise_factor;// Factor between 0 and 1. 0 Correspond ....
 double Psn_1a, Psn_1b, Psn_2, z_effective_data,I_norm_data,z_effective_rand,I_norm_rand,alpha_data,alpha_rand,alpha,I22,I_norm_data2,I_norm_data3,I_norm_data4, I_norm_rand2,I_norm_rand3,I_norm_rand4;
 double P_shot_noise1,P_shot_noise2,P_shot_noise;
 double Bsn1,Bsn2,IN1,IN2,I3_norm_data2,I3_norm_data3,I3_norm_data4,I3_norm_rand2,I3_norm_rand3,I3_norm_rand4,I33,Bsn,IN;
-int num_effective;
+double num_effective;
 double num_effective2;
 
     int n_lines_parallel;//Number of parallel threads
@@ -115,8 +115,8 @@ f=fopen(name_file_ini,"r");
 if(f==NULL){printf("File %s not found...\t exiting now\n",name_file_ini);return 0;}
 else{printf("Reading Inizialization file: %s\n\n",name_file_ini);}
 fscanf(f,"%*s %*s\n");
-fscanf(f,"%*s %*s %*s %*s %s\n",&type_of_survey);
-fscanf(f,"%*s %*s %*s %*s %s\n",&type_of_file);
+fscanf(f,"%*s %*s %*s %*s %s\n",type_of_survey);
+fscanf(f,"%*s %*s %*s %*s %s\n",type_of_file);
 fscanf(f,"%*s %*s %*s %*s %d\n",&gadget_files);
 fscanf(f,"%*s %*s %*s %*s %*s %*s %*s %s\n",RSD);
 printf("== Inizialization Parameters ==\n");
@@ -137,9 +137,9 @@ fscanf(f,"%*s %*s %*s %s\n",do_bispectrum);
 fscanf(f,"%*s %*s %*s %s\n",do_multigrid);
 fscanf(f,"%*s %*s %*s %s\n",triangle_shapes);
 fscanf(f,"%*s %*s %*s %*s %*s %*s %*s %*s %lf\n",&Deltakbis);
-fscanf(f,"%*s %*s %*s %s\n",&triangles_num);
-fscanf(f,"%*s %*s %*s %*s %*s %s\n",&write_triangles);
-fscanf(f,"%*s %*s %*s %*s %*s %*s %s\n\n",&path_for_triangles);
+fscanf(f,"%*s %*s %*s %s\n",triangles_num);
+fscanf(f,"%*s %*s %*s %*s %*s %s\n",write_triangles);
+fscanf(f,"%*s %*s %*s %*s %*s %*s %s\n\n",path_for_triangles);
 
 printf("== Bispectrum Parameters ==\n");
 printf("Do Bispectrum? %s\n",do_bispectrum);
@@ -156,7 +156,7 @@ Ndata=countlines(name_data_in);
 }
 
 printf("== Read in/out options ==\n");
-printf("Reading data file %s; %d lines\n",name_data_in,Ndata);
+printf("Reading data file %s; %ld lines\n",name_data_in,Ndata);
 
 fscanf(f,"%*s %*s %*s %s\n",name_randoms_in);
 
@@ -167,7 +167,7 @@ if(g==NULL){printf("File %s does not exist. Exiting now...\n",name_randoms_in);r
 fclose(g);
 
 Nrand=countlines(name_randoms_in);
-printf("Reading randoms file %s; %d lines\n",name_randoms_in,Nrand);
+printf("Reading randoms file %s; %ld lines\n",name_randoms_in,Nrand);
 }
 
 if(strcmp(type_of_file, "gadget") == 0)
@@ -188,14 +188,14 @@ fscanf(f,"%*s %*s %*s %s\n",name_path_out);
 printf("Output files at %s\n",name_path_out);
 fscanf(f,"%*s %*s %*s %s\n",name_id);
 printf("Output Id %s\n",name_id);
-fscanf(f,"%*s %*s %s\n",&header);
+fscanf(f,"%*s %*s %s\n",header);
 printf("Write header? %s\n\n",header);
 fscanf(f,"%*s %*s\n");
 fscanf(f,"%*s %*s %*s %*s %*s %*s %d\n",&power_grid);
 ngrid=pow(2,power_grid);
 fscanf(f,"%*s %*s %*s %*s %*s %s\n",type_of_mass_assigment);
 printf("== FFT options ==\n");
-printf("Number of k-modes and grid cells per side: %ld\n",ngrid);
+printf("Number of k-modes and grid cells per side: %d\n",ngrid);
 printf("Type of mass assingment %s\n",type_of_mass_assigment);
 
 if(strcmp(type_of_mass_assigment, "NGC") == 0){mode_correction=1;}
@@ -258,7 +258,7 @@ if( strcmp(triangles_num, "EXA_EFF") == 0 &&  strcmp(triangle_shapes,"EQU") !=0)
 if( strcmp(write_triangles, "yes") != 0 &&  strcmp(write_triangles, "no") !=0){printf("Error. write triangle entry must be either 'yes' or 'now'. Exiting now...\n");return 0;}
 if( strcmp(write_triangles, "yes") == 0 && strcmp(triangle_shapes,"SQU") !=0){printf("Waring. Write triangle option 'yes' is only recomended for squeezed triangle shapes 'SQU'. Exiting now...\n");return 0;}
 if( strcmp(header, "yes") !=0 && strcmp(header, "no") !=0){printf("Waring. Write header option must be either 'yes' or 'no'. Entry read %s. Exiting now...\n",header);return 0;}
-if(power_grid<4 || power_grid>15){printf("Warning: Unusual value for number of grid cells per side: 2^%d=%ld. Exiting now...\n",power_grid,ngrid);return 0;}
+if(power_grid<4 || power_grid>15){printf("Warning: Unusual value for number of grid cells per side: 2^%d=%d. Exiting now...\n",power_grid,ngrid);return 0;}
 if(strcmp(type_of_mass_assigment,"NGC") !=0 && strcmp(type_of_mass_assigment,"CIC") !=0 && strcmp(type_of_mass_assigment,"TSC") !=0 && strcmp(type_of_mass_assigment,"PCS") !=0 && strcmp(type_of_mass_assigment,"P4S") !=0 &&  strcmp(type_of_mass_assigment,"P5S") !=0){printf("Error. Type of mass assigment must be either 'NGC', 'CIC', 'TSC', 'PCS', 'P4S' or 'P5S'. Entry read %s. Exiting now...\n",type_of_mass_assigment);return 0;}
 if( strcmp(type_of_yamamoto, "GridCenter") != 0 && strcmp(type_of_yamamoto, "GridAverage") != 0){printf("Error. Type of Yamamoto option must be either 'GridCenter' or 'GridAverage'. Entry read %s. Exiting now...\n",type_of_yamamoto);return 0;}
 if(Ninterlacing<=0){printf("Error: Number of interglacing steps has to be equal or larger than 1. %d\n",Ninterlacing);return 0;}
@@ -318,7 +318,7 @@ Psn_1a=parameter_value[4];
 Psn_1b=parameter_value[5];
 Psn_2=parameter_value[6];
 z_effective_data=parameter_value[7];
-num_effective=(int)(parameter_value[8]);
+num_effective=parameter_value[8];
 I_norm_data=parameter_value[9];
 min=parameter_value[10];
 max=parameter_value[11];
@@ -426,9 +426,9 @@ if( strcmp(header, "yes") == 0)
 {
 fprintf(f,"#Data file %s\n",name_data_in);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Random file %s\n",name_randoms_in);}
-fprintf(f,"#Number of data elements used: %d\n",Ndata2);
-if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %d\n",Nrand2);}
-if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %d\n",num_effective);}
+fprintf(f,"#Number of data elements used: %ld\n",Ndata2);
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %ld\n",Nrand2);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %lf\n",num_effective);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol*wsys: %lf\n",num_effective2);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from data %lf\n",z_effective_data);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from randoms %lf\n",z_effective_rand);}
@@ -441,7 +441,7 @@ if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Normalization %lf\n",I22);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Shot noise factor %lf\n",Shot_noise_factor);}
 fprintf(f,"#Shot noise value %lf\n",P_shot_noise);
 fprintf(f,"#Type of Computation: %s\n",type_of_computation);
-if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of grid cells: %ld\n",ngrid);}
+if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of grid cells: %d\n",ngrid);}
 if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Type of Mass Assigment: %s\n",type_of_mass_assigment);}
 if(strcmp(type_of_computation, "FFT") == 0 && strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Type of Yamamoto: %s\n",type_of_yamamoto);}
 if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of Interlacing steps: %d\n",Ninterlacing);}
@@ -460,9 +460,9 @@ f=fopen(name_bs_out,"w");
 if(f==NULL){printf("Could not write %s\n. Exiting now...\n",name_bs_out);return 0;}
 fprintf(f,"#Data file %s\n",name_data_in);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Random file %s\n",name_randoms_in);}
-fprintf(f,"#Number of data elements used: %d\n",Ndata2);
-if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %d\n",Nrand2);}
-if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %d\n",num_effective);}
+fprintf(f,"#Number of data elements used: %ld\n",Ndata2);
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %ld\n",Nrand2);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %lf\n",num_effective);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol*wsys: %lf\n",num_effective2);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from data %lf\n",z_effective_data);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from randoms %lf\n",z_effective_rand);}
@@ -472,7 +472,7 @@ if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Value of alpha: %lf\n",alp
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Normalization using %s file\n", type_normalization_mode2 );}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Normalization %lf\n",I33);}
 fprintf(f,"#Type of Computation: %s\n",type_of_computation);
-if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of grid cells: %ld\n",ngrid);}
+if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of grid cells: %d\n",ngrid);}
 if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Type of Mass Assigment: %s\n",type_of_mass_assigment);}
 if(strcmp(type_of_computation, "FFT") == 0 && strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Type of Yamamoto: %s\n",type_of_yamamoto);}
 if(strcmp(type_of_computation, "FFT") == 0){fprintf(f,"#Number of Interlacing steps: %d\n",Ninterlacing);}
@@ -488,6 +488,7 @@ fprintf(f,"#k1-centerbin\t k1-eff\t k2-centerbin\t k2-eff\t k3-centerbin\t k3-ef
 
 fclose(f);
 }
+
 
 //Start Power Spectrum Computation for Cutsky
 printf("== Computing the Power Spectrum ==\n");
@@ -509,6 +510,7 @@ if(strcmp(type_of_computation, "FFT") == 0 && strcmp(type_of_survey, "cutsky") =
 parameter_value[0]=L1;
 parameter_value[1]=L2;
 check_box_for_yamamoto(parameter_value,ngrid);
+//exit(0);
 L1=parameter_value[0];
 L2=parameter_value[1];
 

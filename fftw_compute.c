@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <complex.h>//complex.h always BEFORE fftw3.h
@@ -5,6 +6,8 @@
 #include <omp.h>
 #include <math.h>
 #include "functions.h"
+#include "ps_write.h"
+#include "mass_assignment.h"
 #define indexGG(n1,n2,Ngal) (n1)*(Ngal)+(n2)
 #define indexGR(ngal,nrand,Nran) (ngal)*(Nran)+(nran)
 
@@ -35,7 +38,7 @@ struct particle_data
 
 } *P;
 
-int load_snapshot(char *fname, int files, double *params)
+void load_snapshot(char *fname, int files, double *params)
 {
         FILE *fd;
         char   buf[200];
@@ -48,7 +51,7 @@ int load_snapshot(char *fname, int files, double *params)
         for(i=0, pc=0; i<files; i++, pc=pc_new)
     {
                 if(files>1)
-                        sprintf(buf,"%s.%ld",fname,i);
+                        sprintf(buf,"%s.%d",fname,i);
                 else
                         sprintf(buf,"%s",fname);
 
@@ -924,6 +927,7 @@ void fftw_yamamoto_skycut(int mode_yamamoto, double in[], double deltak_re[], do
 	}
 
     out =(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(ngridtotr2c));
+    fftw_plan_with_nthreads(omp_get_max_threads());
     p =  fftw_plan_dft_r2c_3d(ngrid,ngrid,ngrid,in,out,FFTW_ESTIMATE);
 
     fftw_execute(p);//FFT
@@ -1092,7 +1096,7 @@ L2b=L2-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
     delta_data = (double*) calloc(ngridtot, sizeof(double));
-    printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+    printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
     for(c=0; c<Ndata; c++)
     {
        if(strcmp(type_of_mass_assigment, "NGC") == 0){ngc_assingment(delta_data, pos_x[c], pos_y[c], pos_z[c], weight[c], L2b, L1b, ngrid);}
@@ -1220,7 +1224,8 @@ L2b=L2-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
     delta_data = (double*) calloc(ngridtot, sizeof(double));
-    printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+    printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
+    
     for(c=0; c<Ndata; c++)
     {
        if(strcmp(type_of_mass_assigment, "NGC") == 0){ngc_assingment(delta_data, pos_x[c], pos_y[c], pos_z[c], weight[c], L2b, L1b, ngrid);}
@@ -1372,9 +1377,12 @@ free(weight_rand);
 }//loop interlacing
 
 free(kx);
+
 printf("Writing Power Spectrum output %s...",name_ps_out);
 if(hexadecapole_sw==0){write_power_spectrum_skyscuts_L2L2(kmin,kmax,deltak_re0,deltak_im0,deltak_re2,deltak_im2,bin_ps, ngrid,L1,L2,I22,Ninterlacing,name_ps_out,P_shot_noise,binning_type);}
 if(hexadecapole_sw==1){write_power_spectrum_skyscuts_L4(kmin,kmax,deltak_re0,deltak_im0,deltak_re2,deltak_im2,deltak_re4,deltak_im4,bin_ps, ngrid,L1,L2,I22,Ninterlacing,name_ps_out,P_shot_noise, binning_type);}
+
+
 printf("Ok!\n");
 
 }
@@ -1384,7 +1392,7 @@ void loop_interlacing_skycut2(double kmin, double kmax, int Ninterlacing, double
 long int i,j,k,i_inter;
 long int c;
 int i_yama_max;
-i_yama_max;
+//i_yama_max;
 double phase_cos,phase_sin;
 double new_deltak_re0_b,new_deltak_im0_b,new_deltak_re2_b,new_deltak_im2_b,new_deltak_re4_b,new_deltak_im4_b;
 int i_yama;
@@ -1440,7 +1448,7 @@ L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
 if(i_inter==1)
 {
-        printf("Assigning particles to the grid and FFTing (Iteration %d) ...", i_inter);
+        printf("Assigning particles to the grid and FFTing (Iteration %ld) ...", i_inter);
 
           for(i_yama=0;i_yama<=i_yama_max;i_yama++)
           {
@@ -1561,7 +1569,7 @@ if(i_yama>=7){fftw_yamamoto_skycut(i_yama, delta_data, deltak_re4, deltak_im4, n
 
   }
   else{  
-        printf("Assigning particles to the grid and FFTing (Iteration %d) ...", i_inter);
+        printf("Assigning particles to the grid and FFTing (Iteration %ld) ...", i_inter);
 
         for(i_yama=0;i_yama<=i_yama_max;i_yama++)
           {
@@ -1735,6 +1743,7 @@ free(weight_rand);
 
 }
 free(kx);
+
 printf("Writing Power Spectrum output %s...",name_ps_out);
 if(hexadecapole_sw==0){write_power_spectrum_skyscuts_L2L2(kmin,kmax,deltak_re0,deltak_im0,deltak_re2,deltak_im2,bin_ps, ngrid,L1,L2,I22,Ninterlacing,name_ps_out,P_shot_noise,binning_type);}
 if(hexadecapole_sw==1){write_power_spectrum_skyscuts_L4(kmin,kmax,deltak_re0,deltak_im0,deltak_re2,deltak_im2,deltak_re4,deltak_im4,bin_ps, ngrid,L1,L2,I22,Ninterlacing,name_ps_out,P_shot_noise,binning_type);}
@@ -1778,7 +1787,7 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
      L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
      delta_data = (double*) calloc(ngridtot, sizeof(double));
-     printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+     printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
      for(c=0; c<Ndata; c++)
      {
        if(strcmp(type_of_mass_assigment, "NGC") == 0){ngc_assingment(delta_data, pos_x[c], pos_y[c], pos_z[c], weight[c], L2b, L1b, ngrid);}
@@ -1878,7 +1887,7 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
      L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
      delta_data = (double*) calloc(ngridtot, sizeof(double));
-     printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+     printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
      for(c=0; c<Ndata; c++)
      {
        if(strcmp(type_of_mass_assigment, "NGC") == 0){ngc_assingment(delta_data, pos_x[c], pos_y[c], pos_z[c], weight[c], L2b, L1b, ngrid);}
@@ -2007,7 +2016,7 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
      L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
      delta_data = (double*) calloc(ngridtot, sizeof(double));
-     printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+     printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
 
 Ndata=0;
 for(snapshot_num=0;snapshot_num<gadget_files;snapshot_num++)
@@ -2156,7 +2165,7 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
      L1b=L1-(L2-L1)/ngrid*1.*1./Ninterlacing*1.*(i_inter-1);
 
      delta_data = (double*) calloc(ngridtot, sizeof(double));
-     printf("Assigning particles to the grid (Iteration %d) ...", i_inter);
+     printf("Assigning particles to the grid (Iteration %ld) ...", i_inter);
 
 Ndata=0;
 for(snapshot_num=0;snapshot_num<gadget_files;snapshot_num++)
@@ -2175,7 +2184,7 @@ Ndata=Ndata+NumPart_file;
  pos_y = (double*) calloc(NumPart_file, sizeof(double));
  pos_z = (double*) calloc(NumPart_file, sizeof(double));
 
-printf("%ld\n",NumPart_file);
+printf("%d\n",NumPart_file);
      for(c=0; c<NumPart_file; c++)
      {
      pos_x[c]=P[c].Pos[0]*0.001; //conversion to Mpc/h (originally in kpc/h)

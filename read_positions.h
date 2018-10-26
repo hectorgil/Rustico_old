@@ -12,4 +12,4 @@ void z_to_r(unsigned ndim, const double *x, void *fdata, unsigned fdim, double *
 
 long int get_number_used_lines_data(char *filename, double parameter_value[]);
 
-long int get_number_used_lines_data(char *filename, double parameter_value[]);
+long int get_number_used_lines_randoms(char *filename, double parameter_value[]);

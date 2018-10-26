@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <math.h>
-#include <string.h>
 #include "functions.h"
 
 double Leg2(double x)
@@ -66,13 +65,13 @@ if(bintype_sw==1){Nk=(int)((log10(sqrt(3.)*2.*Pi*ngrid/(2.*(L2-L1)))-log10(2.*Pi
                 tid=omp_get_thread_num();
 if(bintype_sw==0){
 
-l=(int)((pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5)-kmin)/Deltak);//-1.;
+l=(int)((pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5)-kmin)/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
 if(bintype_sw==1){
 
-l=(int)(( log10(pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5))-log10(kmin))/Deltak);//-1.;
+l=(int)(( log10(pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5))-log10(kmin))/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
@@ -121,7 +120,7 @@ if(bintype_sw==1){keff=pow(10,(l+0.5)*Deltak+log10(kmin));}
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         
 
-                        fprintf(f,"%lf %lf %lf %lf %ld %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],nmodes[l][0], P_shot_noise);
+                        fprintf(f,"%lf %lf %lf %lf %i %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],nmodes[l][0], P_shot_noise);
 
 
                 }
@@ -194,13 +193,13 @@ if(bintype_sw==1){Nk=(int)((log10(sqrt(3.)*2.*Pi*ngrid/(2.*(L2-L1)))-log10(2.*Pi
 
 if(bintype_sw==0){
 
-l=(int)((pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5)-kmin)/Deltak);//-1.;
+l=(int)((pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5)-kmin)/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
 if(bintype_sw==1){
 
-l=(int)(( log10(pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5))-log10(kmin))/Deltak);//-1.;
+l=(int)(( log10(pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5))-log10(kmin))/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
@@ -261,7 +260,7 @@ if(bintype_sw==1){keff=pow(10,(l+0.5)*Deltak+log10(kmin));}
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         Hexadeca[l][0]*=1./(nmodes[l][0]*1.*I22);
 
-                        fprintf(f,"%lf %lf %lf %lf %lf %ld %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
+                        fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
 
 
                 }
@@ -332,13 +331,13 @@ if(bintype_sw==1){Nk=(int)((log10(sqrt(3.)*2.*Pi*ngrid/(2.*(L2-L1)))-log10(2.*Pi
 
 if(bintype_sw==0){
 
-l=(int)((pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5)-kmin)/Deltak);//-1.;
+l=(int)((pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5)-kmin)/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
 if(bintype_sw==1){
 
-l=(int)(( log10(pow(kx[i]*kx[i]+ky[i]*ky[i]+kz[i]*kz[i],0.5))-log10(kmin))/Deltak);//-1.;
+l=(int)(( log10(pow(kx[i]*kx[i]+kx[j]*kx[j]+kx[k]*kx[k],0.5))-log10(kmin))/Deltak);//-1.;
 if(l<0){l=0;}
 }
 
@@ -397,7 +396,7 @@ if(bintype_sw==1){keff=pow(10,(l+0.5)*Deltak+log10(kmin));}
                         Mono[l][0]*=1./(nmodes[l][0]*1.*I22);
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         Hexadeca[l][0]*=1.0/(nmodes[l][0]*1.*I22);
-                        fprintf(f,"%lf %lf %lf %lf %lf %ld %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
+                        fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",keff, K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
 
 
                 }
@@ -514,7 +513,7 @@ index2=((pow(ngrid,2)*i+ngrid*j+2*k)/2+i*ngrid+j);
 
 
 if(index2>0){
-Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
+          Mono[l][tid]+=pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2);
 Quadru[l][tid]+=deltak_re0[index2]/N_interlacing*1.*0.5*(3.*deltak_re2[index2]/N_interlacing*1.-deltak_re0[index2]/N_interlacing*1.)+deltak_im0[index2]/N_interlacing*1.*0.5*(3.*deltak_im2[index2]/N_interlacing*1.-deltak_im0[index2]/N_interlacing*1.);
 Hexadeca[l][tid]+=315./8.*(pow(deltak_re2[index2]/N_interlacing*1.,2)+pow(deltak_im2[index2]/N_interlacing*1.,2))-135./4.*(deltak_re0[index2]/N_interlacing*1.*deltak_re2[index2]/N_interlacing*1.+deltak_im0[index2]/N_interlacing*1.*deltak_im2[index2]/N_interlacing*1.)+27./8.*(pow(deltak_re0[index2]/N_interlacing*1.,2)+pow(deltak_im0[index2]/N_interlacing*1.,2));
 nmodes[l][tid]+=1;
@@ -541,7 +540,7 @@ Hexadeca[l][tid]+=315./8.*(pow(deltak_re2[index2]/N_interlacing*1.,2)+pow(deltak
 }
 
 }
-              }
+               }
       }
 
 for(l=0;l<Nk;l++)
@@ -557,6 +556,7 @@ nmodes[l][0]+=nmodes[l][tid];
 }
 }
 
+
   f=fopen(name_ps_out,"a");
  
         for(l=0;l<Nk;l++)
@@ -567,10 +567,9 @@ nmodes[l][0]+=nmodes[l][tid];
                         Mono[l][0]*=1./(nmodes[l][0]*1.*I22);
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         Hexadeca[l][0]*=1.0/(nmodes[l][0]*1.*I22);
-
 if(k_av[l][0]>=kmin && k_av[l][0]<=kmax ){
 
-                        fprintf(f,"%lf %lf %lf %lf %lf %ld %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
+                        fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
 }
                         
                 }
@@ -746,7 +745,7 @@ nmodes[l][0]+=nmodes[l][tid];
                         Quadru[l][0]*=5./(nmodes[l][0]*1.*I22);
                         Hexadeca[l][0]*=1./(nmodes[l][0]*I22);
 if(k_av[l][0]>=kmin && k_av[l][0]<=kmax){
-                        fprintf(f,"%lf %lf %lf %lf %lf %ld %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
+                        fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);
 }
                         
                 }
@@ -933,7 +932,7 @@ nmodes[l][0]+=nmodes[l][tid];
                         Quadru[l][0]*=pow(L2-L1,3)*5./(nmodes[l][0]*1.);
                         Hexadeca[l][0]*=pow(L2-L1,3)*9/(nmodes[l][0]);
 if(k_av[l][0]<=kmax && k_av[l][0]>=kmin){
-                        fprintf(f,"%lf %lf %lf %lf %lf %ld %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);}
+                        fprintf(f,"%lf %lf %lf %lf %lf %i %lf\n",k_av[l][0],K[l][0],Mono[l][0]-P_shot_noise,Quadru[l][0],Hexadeca[l][0],nmodes[l][0], P_shot_noise);}
 
 
                 }

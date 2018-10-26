@@ -4,7 +4,7 @@
 
 long int count_particles_gadget(char *name_data_in);
 
-int load_snapshot(char *fname, int files, int *params);
+void load_snapshot(char *fname, int files, int *params);
 
 void loop_interlacing_periodic_gadget(double kmin,double kmax, int Ninterlacing, char *name_data_in ,int gadget_files, double L1, double L2, int ngrid, double bin_ps, int mode_correction, int n_lines_parallel, char *binning_type, char *name_ps_out, char *type_of_mass_assigment,double Shot_noise_factor,char *grid_correction_string, char *RSD);
 
