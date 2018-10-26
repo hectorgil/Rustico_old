@@ -4,6 +4,8 @@
 #include <complex.h>//complex.h always BEFORE fftw3.h
 #include <fftw3.h>
 #include <omp.h>
+#include <string.h> /* memset */
+#include <unistd.h> /* close */
 #include "fftw_compute.h"
 #include "order_algorithm.h"
 #include "functions.h"
@@ -61,6 +63,7 @@ long int l_new;
 
   in_bis= (fftw_complex*) fftw_malloc(ngridr2c*sizeof(fftw_complex));
   memset(in_bis, 0, (ngridr2c)*sizeof(fftw_complex));//set to 0 elements of in_bis1
+    fftw_plan_with_nthreads(omp_get_max_threads());
   p=fftw_plan_dft_c2r_3d(ngrid,ngrid,ngrid,in_bis,out_k1,FFTW_ESTIMATE);
 
  
@@ -165,10 +168,12 @@ long int l_new;
 
   in_bis= (fftw_complex*) fftw_malloc(ngridr2c*sizeof(fftw_complex));
   memset(in_bis, 0, (ngridr2c)*sizeof(fftw_complex));//set to 0 elements of in_bis1
+    fftw_plan_with_nthreads(omp_get_max_threads());
   p=fftw_plan_dft_c2r_3d(ngrid,ngrid,ngrid,in_bis,out_k1,FFTW_ESTIMATE);
 
    in_bis_NT= (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*ngridr2c);
    memset(in_bis_NT, 0, ngridr2c*sizeof(fftw_complex));//set to 0 elements of in_bis
+    fftw_plan_with_nthreads(omp_get_max_threads());
    p_NT=fftw_plan_dft_c2r_3d(ngrid,ngrid,ngrid,in_bis_NT,out_k1_NT,FFTW_ESTIMATE);
 
   ki=k_input;
@@ -278,6 +283,7 @@ long int l_new;
 
    in_bis_NT= (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*ngridr2c);
    memset(in_bis_NT, 0, ngridr2c*sizeof(fftw_complex));//set to 0 elements of in_bis
+    fftw_plan_with_nthreads(omp_get_max_threads());
    p_NT=fftw_plan_dft_c2r_3d(ngrid,ngrid,ngrid,in_bis_NT,out_k1_NT,FFTW_ESTIMATE);
 
   ki=k_input;
