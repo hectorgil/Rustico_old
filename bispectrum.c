@@ -728,7 +728,7 @@ Q=B/(P1*P2+P1*P3+P2*P3);
 fprintf(f,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",K_eff1, K1[i1], K_eff2,  K2[i1][i2], K_eff3, K3[i1][i2][i3],B, B_shot_noise,Q,Q_shot_noise, Number_triangles);
 bin++;
 
-
+//printf("aaaaA");
 //if(K1[i1]==K2[i1][i2] && K1[i1]==K3[i1][i2][i3])
 //{  
 //printf("%lf %lf %lf %lf %lf %e %lf %lf \n", K_eff1, K_eff2, K_eff3,B,B_shot_noise, Number_triangles,P1,Psn);
@@ -769,6 +769,8 @@ free(Power);
 if(strcmp(triangles_num, "FFT") == 0){free(Number);}
 
 input_bin[0]=bin;
+//printf("finish");
+//exit(0);
 }
 
         
@@ -1005,7 +1007,7 @@ long int ngridtotr2c;
 int Nk1,*Nk2,*I2,**Nk3,**I3;
 double *K1eff,**K2eff,***K3eff;
 long int i1,i2,i3,ll;
-
+int periodic;
         Nktot=count_triangles(kmin,kmax,Deltakbis,triangle_shapes);
         grid= (int *) calloc(Nktot,sizeof(int));
         K1= (double*) calloc(Nktot,sizeof(double));
@@ -1013,7 +1015,6 @@ long int i1,i2,i3,ll;
         K3= (double*) calloc(Nktot,sizeof(double));
 
 select_triangles(kmin,kmax,Deltakbis,L1,L2,K1,K2,K3,grid,Nktot,ngrid,do_multigrid,triangle_shapes);
-
 
 //loop over grid cells
 l=0;
@@ -1042,10 +1043,12 @@ if(Nktot_i>0)//There are some triangles associated to that gridsize.
 //put particles in a grid cell and forier transform it to get deltak(k)
 if(I33==0 && I22==0 && IN==0 && Bsn==0 && alpha==0 )//periodic
 {
+periodic=1;
  loop_interlacing_periodic_for_bispectrum(Ninterlacing, s_x, s_y, s_z, weight, Ndata, L1, L2, ngrid_i, n_lines_parallel, type_of_mass_assigment, mode_correction, deltak_re, deltak_im);
 }
 else//Cutsky
 {
+periodic=0;
 loop_interlacing_skycut_for_bispectrum(Ninterlacing, s_x, s_y, s_z, weight, Ndata, s_x_ran, s_y_ran, s_z_ran, weight_ran, Nrand, L1, L2, ngrid_i, alpha, n_lines_parallel, type_of_mass_assigment, mode_correction, deltak_re, deltak_im);
 }
 
@@ -1179,6 +1182,7 @@ free(K3sel);
 //compute and write bispectrum with selected triangles.
 bispectrum_calculator(K1eff, K2eff, K3eff, Nk1, Nk2, Nk3, deltak_re, deltak_im,Ninterlacing, kmin, kmax, L1, L2, ngrid_i, Deltakbis, I33,I22, IN, Bsn,P_shot_noise, n_lines_parallel, binning_type, name_bs_out,triangles_num, write_triangles, triangles_id, input_bin);
 
+
 free(K1eff);
 freeTokens(K2eff,Nk1);
 freeTokens2(K3eff,Nk1,Nk2);
@@ -1202,10 +1206,14 @@ free(s_x);
 free(s_y);
 free(s_z);
 free(weight);
+
+if(periodic==0)//no periodic case
+{
 free(s_x_ran);
 free(s_y_ran);
 free(s_z_ran);
 free(weight_ran);
+}
 free(K1);
 free(K2);
 free(K3);
@@ -1390,6 +1398,7 @@ free(K3sel);
 
 bispectrum_calculator(K1eff, K2eff, K3eff, Nk1, Nk2, Nk3, deltak_re, deltak_im,Ninterlacing, kmin, kmax, L1, L2, ngrid_i, Deltakbis, 0, 0, 0, 0, Power_spectrum_shot_noise, n_lines_parallel, binning_type, name_bs_out,triangles_num, write_triangles, triangles_id, input_bin);
 
+
 free(K1eff);
 freeTokens(K2eff,Nk1);
 freeTokens2(K3eff,Nk1,Nk2);
@@ -1406,10 +1415,10 @@ free(deltak_im);
 
 }while(ngrid_i<ngrid);
 
-
 free(K1);
 free(K2);
 free(K3);
 free(grid);
+
 }
 
