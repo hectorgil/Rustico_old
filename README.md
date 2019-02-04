@@ -1,8 +1,13 @@
 RUSTICO: Rapid foUrier STatIstics COde
+
 Author: Hector Gil Marin
+
 Date: 4th Feb. 2019
+
 Internal Version: 3.2
+
 email: hector.gil.marin@gmail.com or hectorgil@icc.ub.edu
+
 (c) All rights reserved
 
 ====Compilation Examples====
@@ -92,34 +97,13 @@ Do Multigrid (yes/no): Option for the bispectrum computation. If enable, the bis
 #Compute Shot noise as (double): Shot noise factor parameter. See. Gil-Marin et al. 2014 Eq. ..... Only for skycut option
 
 
-====Output Structure====
 
-The power spectrum output have the following format:
-k-eff, k-centerbin, Monopole-Pshotnoise, Quadrupole, Hexadecapole, number of modes, Pshotnoise
+====Public and Private use====
 
-The bispectrum output have the following format:
-k1-eff, k1-centerbin, k2-eff, k2-centerbin, k3-eff, k3-centerbin, B0-Bshotnoise, Bshotnoise, Reduced Bispectrum, Reduced Bispectrum shot noise, number of triangles
-
-For the skycut option, the code automatically generates two extra file for the number density of objects as a function of redshift for the data and random files with the following format,
-
-#data
-
-#Interval: xxx Mpc/h
-
-#z < nobs > < wc nobs> < wc wfkp nobs>
-
-#random
-
-#Interval: yyy  Mpc/h
-
-#alpha< ns > alpha < wfkp ns >
-
-where xxx and yyy are the interval choosen by the code to bin the data and randoms, respectively, < nobs > are the raw number density of observed objects, < wc nobs> is the number density of observed objects weighted by the collision weights, and < wc wfkp nobs> weighted by the collision weights and fkp weights. For the randoms, these number densities are scaled by alpha in order to match the data ones. 
-
-====Citation====
-
-If you use this code for your published or unpublished work, please refer it to Gil-Marin, Hector in prep. 2017
+Please contact me first if you want to use this code for your research. 
 
 ====Disclaimer====
 
-....
+The code is currently under developement. Please report any unexpected or bad behaviour you may find. 
+
+I don't take any responsability for a potential malfunction of the code and the effects it may cause on your computer. 
