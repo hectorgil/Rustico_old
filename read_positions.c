@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "cubature.h"
 #include <string.h>
-
+#include "cubature.h"
+#include "read_line.h"
 
 typedef struct {
 	              double OMEGA_M;
@@ -22,27 +22,30 @@ void z_to_r(unsigned ndim, const double *x, void *fdata, unsigned fdim, double *
 long int get_number_used_lines_data(char *filename, double parameter_value[])
 {
 FILE *f;
-long int npar=(int)(parameter_value[3]);
+long int npar=(long int)(parameter_value[3]);
 double z_min=parameter_value[1];
 double z_max=parameter_value[2];
 long int i;
-int weight_col;
+double  weight_col;
 double redshift;
 long int npar_used=0;
 int veto;
+double params[8];
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
 
-fscanf(f,"%*f %*f %lf %*f %d %*f %*f\n",&redshift, &weight_col);veto=1;//data
-//fscanf(f,"%*f %*f %lf %*f %*f %*f %d\n",&redshift,&veto);weight_col=1;//EZmocks
-if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
+get_line(f, params,0);
+
+redshift=params[2];
+weight_col=params[5];
+veto=(int)(params[7]);
+if(redshift>z_min && redshift<z_max && veto==1 && weight_col>0)
 {
 npar_used++;
 }
 }
 fclose(f);
-//free(f);
 return npar_used;
 }
 
@@ -50,20 +53,23 @@ long int get_number_used_lines_randoms(char *filename, double parameter_value[])
 {
 FILE *f;
 double redshift;
-long int npar=(int)(parameter_value[3]);
+long int npar=(long int)(parameter_value[3]);
 double z_min=parameter_value[1];
 double z_max=parameter_value[2];
 long int i;
-int weight_col;
+double weight_col;
 int veto;
+double params[8];
 long int npar_used=0;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-        fscanf(f,"%*f %*f %lf %*f %*f\n",&redshift);veto=1;//data
-//          fscanf(f,"%*f %*f %lf %*f %*f %*f %d\n",&redshift,&veto);//EZmocks
+get_line(f, params,1);
+veto=(int)(params[7]);
+weight_col=params[5];
+redshift=params[2];
 
-if(redshift>z_min && redshift<z_max && veto==1)
+if(redshift>z_min && redshift<z_max && veto==1 && weight_col>0)
 {
 npar_used++;
 }
@@ -87,18 +93,21 @@ function_parameters = (f_params *) malloc(sizeof(f_params));
 double MIN[1];
 double MAX[1];
 double r_min,r_max;
-int npar,weight_col;
+long int npar;
+double weight_col;
 long int i;
 FILE *f,*g;
 double redshift,weight_fkp,weight_sys, radial,nuissance;
-npar=(int)(parameter_value[3]);
+npar=(long int)(parameter_value[3])-3;
 double Area;
 long int n_bin_r;
 double DeltaR=parameter_value[25];
 long int index_radial;
-double *radial_cell_haloes, *radial_all_weight_cell_haloes,*radial_fkp_cell_haloes, *radial_weight_cell_haloes;
-double *z_cell_haloes;
+double *radial_cell, *radial_all_weight_cell,*radial_fkp_cell, *radial_weight_cell;
+double *z_cell;
 int veto;
+double params[8];
+
 Area=parameter_value[13]*pow(Pi/180.,2);
 
   MAX[0]=z_min;
@@ -110,19 +119,25 @@ Area=parameter_value[13]*pow(Pi/180.,2);
 
 
   n_bin_r=(long int)((r_max-r_min)/DeltaR);
-  radial_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_all_weight_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_fkp_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_weight_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  z_cell_haloes= (double*) calloc(n_bin_r, sizeof(double));
+  radial_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_all_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_fkp_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
+  z_cell= (double*) calloc(n_bin_r, sizeof(double));
 
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-fscanf(f,"%*f %*f %lf %lf %d %lf %*f\n",&redshift, &weight_fkp, &weight_col, &weight_sys);veto=1;
-//fscanf(f,"%*f %*f %lf %lf %*f %*f %d\n",&redshift,&weight_fkp,&veto);weight_col=1;weight_sys=1;//EZmocks
 
-if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
+get_line(f, params,0);
+
+redshift=params[2];
+weight_fkp=params[3];
+weight_col=params[5];
+weight_sys=params[6];
+veto=(int)(params[7]);
+
+if(redshift>z_min && redshift<z_max && veto==1 && weight_col>0)
   {
 
   MAX[0]=redshift;
@@ -130,37 +145,37 @@ if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
   adapt_integrate(1, z_to_r , function_parameters, 1, MIN, MAX ,100000, 1e-6, 1e-6, &radial, &nuissance);
 
       index_radial=(long int)(n_bin_r*(radial-r_min)/(r_max-r_min));
-      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld)\n",radial,redshift,r_min,r_max,i);break;}
-      radial_cell_haloes[index_radial]+=1.;
-      radial_fkp_cell_haloes[index_radial]+=weight_fkp;
-      radial_weight_cell_haloes[index_radial]+=weight_col*weight_sys;
-      radial_all_weight_cell_haloes[index_radial]+=weight_col*weight_sys*weight_fkp;
-      z_cell_haloes[index_radial]+=redshift;
+      if( index_radial<0 || index_radial>n_bin_r-1){printf("\n Error bins data1 (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld) %ld %lf. Exiting now...\n",radial,redshift,r_min,r_max,i,n_bin_r,DeltaR);exit(0);}
+      radial_cell[index_radial]+=1.;
+      radial_fkp_cell[index_radial]+=weight_fkp;
+      radial_weight_cell[index_radial]+=weight_col*weight_sys;
+      radial_all_weight_cell[index_radial]+=weight_col*weight_sys*weight_fkp;
+      z_cell[index_radial]+=redshift;
 
 }
 
 }
 printf("\nWriting %s...",name_den_out);
         f=fopen(name_den_out,"w");
+        if(f==NULL){printf("File %s could not be created. Exiting now...\n",name_den_out);exit(0);}
         fprintf(f,"#Interval: %lf Mpc/h\n",DeltaR);
         fprintf(f,"# z <nobs> <wc nobs> <wc wfkp nobs>\n");
         for(i=0;i<n_bin_r;i++)
         {
-                if(radial_cell_haloes[i]!=0)
+                if(radial_cell[i]!=0)
                 {
-                        z_cell_haloes[i]=z_cell_haloes[i]/radial_cell_haloes[i];
-                        fprintf(f,"%lf %.16lf %.16lf %.16lf\n",z_cell_haloes[i],radial_cell_haloes[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.),  radial_weight_cell_haloes[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.), radial_all_weight_cell_haloes[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.) );
+                        z_cell[i]=z_cell[i]/radial_cell[i];
+                        fprintf(f,"%lf %.16lf %.16lf %.16lf\n",z_cell[i],radial_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.),  radial_weight_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.), radial_all_weight_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.) );
                 }
         }
         fclose(f);
 printf("Ok!\n");
-free(radial_cell_haloes);
-free(radial_all_weight_cell_haloes);
-free(radial_fkp_cell_haloes);
-free(radial_weight_cell_haloes);
-free(z_cell_haloes);
+free(radial_cell);
+free(radial_all_weight_cell);
+free(radial_fkp_cell);
+free(radial_weight_cell);
+free(z_cell);
 free(function_parameters);
-
 }
 
 
@@ -177,24 +192,24 @@ function_parameters = (f_params *) malloc(sizeof(f_params));
 double MIN[1];
 double MAX[1];
 double Pi=(4.*atan(1.));
-int npar,weight_col;
+long int npar;
+double weight_col;
 long int i;
 FILE *f;
 double RA,dec,redshift,weight_fkp,weight_sys,n_z,theta, radial,nuissance,max,min;
-npar=(int)(parameter_value[3]);
+npar=(long int)(parameter_value[3]);
 double Area;
 long int n_bin_r;
 double r_min,r_max;
 Area=parameter_value[13]*pow(Pi/180.,2);
-double normalization;
+double normalization,normalizationbis;
 double zeff;
-double num,num3;
-int num2;
+double num,numzeff;
+double num2;
 long int npar_used;
 double Psn_1a;
 double Psn_1b;
-double Psn_2;
-double Bsn_1,Bsn_2;
+double Bsn_1a,Bsn_1b;
 double alpha_data;
 double I22,I22_w_data,I22_w_data_will;
 double I33,I33_w_data,I33_w_data_will;
@@ -202,13 +217,15 @@ double IN1,IN2;
 double DeltaR;
 double DeltaR_min;
 long int index_radial;
-double *radial_cell_haloes, *radial_all_weight_cell_haloes,*radial_fkp_cell_haloes, *radial_weight_cell_haloes;
-double *radial_weight_cell_haloesN1, *radial_weight_cell_haloesN2, *z_cell;
+double *radial_cell, *radial_all_weight_cell,*radial_fkp_cell, *radial_weight_cell;
+double *radial_weight_cell_N1, *radial_weight_cell_N2, *z_cell;
 int i_DeltaR;
 double I22_min,I22_w_data_min,I22_w_data_will_min;
 double I33_min,I33_w_data_min,I33_w_data_will_min;
-double IN1_min,IN2_min;
+double IN1_min,IN2_min,IN11,IN22;
 int veto;
+double params[8];
+
 I22_min=0;
 I22_w_data_min=0;
 I22_w_data_will_min=0;
@@ -229,28 +246,30 @@ i_DeltaR=0;
 do
 {
 normalization=0;
+normalizationbis=0;
 zeff=0;
 num=0;
 num2=0;
-num3=0;
+numzeff=0;
 npar_used=0;
 Psn_1a=0;
 Psn_1b=0;
-Psn_2=0;
-Bsn_1=0;
-Bsn_2=0;
+Bsn_1a=0;
+Bsn_1b=0;
+IN11=0;
+IN22=0;
 alpha_data=0;
 
 i_DeltaR++;
 DeltaR=i_DeltaR*0.5;
 
   n_bin_r=(long int)((r_max-r_min)/DeltaR);
-  radial_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_all_weight_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_fkp_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_weight_cell_haloes = (double*) calloc(n_bin_r, sizeof(double));
-  radial_weight_cell_haloesN1= (double*) calloc(n_bin_r, sizeof(double));
-  radial_weight_cell_haloesN2= (double*) calloc(n_bin_r, sizeof(double));
+  radial_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_all_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_fkp_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_weight_cell_N1= (double*) calloc(n_bin_r, sizeof(double));
+  radial_weight_cell_N2= (double*) calloc(n_bin_r, sizeof(double));
   z_cell= (double*) calloc(n_bin_r, sizeof(double));
 
   max=-9999999;
@@ -258,19 +277,30 @@ DeltaR=i_DeltaR*0.5;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-fscanf(f,"%lf %lf %lf %lf %d %lf %lf\n", &RA, &dec, &redshift, &weight_fkp, &weight_col, &weight_sys, &n_z);veto=1;
-//fscanf(f,"%lf %lf %lf %lf %*f %lf %d\n",&RA,&dec,&redshift,&weight_fkp,&n_z,&veto);weight_col=1;weight_sys=1;//EZmocks
+
+get_line(f, params,0);
+
+RA=params[0];
+dec=params[1];
+redshift=params[2];
+weight_fkp=params[3];
+n_z=params[4];
+weight_col=params[5];
+weight_sys=params[6];
+veto=(int)(params[7]);
+
 
 theta=90.-dec;
-if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
+if(redshift>z_min && redshift<z_max  && veto==1 && weight_col>0)
   {
   normalization+=n_z*weight_fkp*weight_fkp*weight_sys*weight_col;//effective normalization from data. Factor I22
-  zeff+=redshift*weight_col*weight_fkp*weight_sys;//Effective redshift
+  normalizationbis+=n_z*n_z*weight_fkp*weight_fkp*weight_fkp*weight_sys*weight_col;//effective normalization from data. Factor I33
+  zeff+=redshift*pow(weight_col*weight_sys*weight_fkp,2);
   num+=weight_col*weight_sys;//Effective number of objects with wsys (real number)
-  num2+=weight_col;//Effective number of objects without wsys (integer number)
-  num3+=weight_col*weight_fkp*weight_sys;
-  
-//from deg to radiants
+  numzeff+=pow(weight_col*weight_sys*weight_fkp,2);//normalizes zeff
+  num2+=weight_col;//Effective number of objects without wsys
+
+  //from deg to radiants
   RA=RA*Pi/180.;
   dec=dec*Pi/180.;
   theta=theta*Pi/180.;
@@ -281,13 +311,14 @@ if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
   adapt_integrate(1, z_to_r , function_parameters, 1, MIN, MAX ,100000, 1e-6, 1e-6, &radial, &nuissance);
 
       index_radial=(long int)(n_bin_r*(radial-r_min)/(r_max-r_min));
-      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld)\n",radial,redshift,r_min,r_max,i);break;}   
-      radial_cell_haloes[index_radial]+=1.;
-      radial_fkp_cell_haloes[index_radial]+=weight_fkp;
-      radial_weight_cell_haloes[index_radial]+=weight_col*weight_sys;
-      radial_all_weight_cell_haloes[index_radial]+=weight_col*weight_sys*weight_fkp;
-      radial_weight_cell_haloesN1[index_radial]+=pow(weight_col*weight_sys,2);
-      radial_weight_cell_haloesN2[index_radial]+=weight_col*pow(weight_sys,2);
+      if( index_radial<0 || index_radial>n_bin_r-1){printf("\n Error bins data2 (radial) radial=%lf z=(%lf < %lf < %lf)  r=(%lf,%lf) (line=%ld) %ld %lf. Om=%lf. Exiting now...\n",radial,z_min,redshift,z_max,r_min,r_max,i,n_bin_r,DeltaR,Omega_m);exit(0);}   
+
+      radial_cell[index_radial]+=1.;
+      radial_fkp_cell[index_radial]+=weight_fkp;
+      radial_weight_cell[index_radial]+=weight_col*weight_sys;
+      radial_all_weight_cell[index_radial]+=weight_col*weight_sys*weight_fkp;
+      radial_weight_cell_N1[index_radial]+=pow(weight_col*weight_sys,2);
+      radial_weight_cell_N2[index_radial]+=weight_col*pow(weight_sys,2);
       z_cell[index_radial]+=redshift;
 
 
@@ -298,12 +329,13 @@ if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
  
   weight[npar_used]=weight_fkp*weight_col*weight_sys;//total weight
 
+
   Psn_1a+=pow(weight_fkp*weight_col*weight_sys,2);//false pairs
   Psn_1b+=weight_fkp*weight_col*weight_sys*weight_fkp*weight_sys;// true pairs
-  Psn_2+=weight_fkp*weight_fkp*weight_col*weight_sys;//same quantity for both false and true pairs
-  Bsn_1+=pow(weight_fkp*weight_col*weight_sys,3);
-  Bsn_2+=pow(weight_fkp,3)*weight_col*weight_sys;
-
+  Bsn_1a+=pow(weight_fkp*weight_col*weight_sys,3);//false pairs
+  Bsn_1b+=pow(weight_fkp*weight_sys,3)*weight_col;//true pairs
+  IN11+=n_z*pow(weight_fkp,3)*pow(weight_col*weight_sys,2);//false pairs
+  IN22+=n_z*pow(weight_fkp,3)*pow(weight_sys,2)*weight_col;//true pairs
 
   if(pos_x[npar_used]>max || npar_used==0){max=pos_x[npar_used];}
   if(pos_y[npar_used]>max){max=pos_y[npar_used];}
@@ -312,14 +344,13 @@ if(redshift>z_min && redshift<z_max && weight_col>0 && veto==1)
   if(pos_y[npar_used]<min){min=pos_y[npar_used];}
   if(pos_z[npar_used]<min){min=pos_z[npar_used];}
  
- alpha_data+=weight_col*weight_sys*weight_fkp; 
+ alpha_data+=weight_col*weight_sys*weight_fkp;
   npar_used++;
 
   }
   
   }
 fclose(f);
-
 
         I22=0;I33=0;
         I22_w_data=0;I33_w_data=0;
@@ -328,40 +359,40 @@ fclose(f);
 
         for(i=0;i<n_bin_r;i++)
         {
-         I22+=Area*pow(radial_all_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
-         I33+=Area*pow(radial_all_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+         I22+=Area*pow(radial_all_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+         I33+=Area*pow(radial_all_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
-          if(radial_cell_haloes[i]!=0)
+          if(radial_cell[i]!=0)
           {
 //Normalization of the Power Spectrum
-             I22_w_data+=Area*pow(radial_fkp_cell_haloes[i]/radial_cell_haloes[i]*1.,2)*pow(radial_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
-             I22_w_data_will+=Area*pow(radial_all_weight_cell_haloes[i]/radial_cell_haloes[i]*1.,2)*pow(radial_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+             I22_w_data+=Area*pow(radial_fkp_cell[i]/radial_cell[i]*1.,2)*pow(radial_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+             I22_w_data_will+=Area*pow(radial_all_weight_cell[i]/radial_cell[i]*1.,2)*pow(radial_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),2)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
 //Normalization of the Bispectrum
-             I33_w_data+=Area*pow(radial_fkp_cell_haloes[i]/radial_cell_haloes[i]*1.,3)*pow(radial_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+             I33_w_data+=Area*pow(radial_fkp_cell[i]/radial_cell[i]*1.,3)*pow(radial_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
-             I33_w_data_will+=Area*pow(radial_all_weight_cell_haloes[i]/radial_cell_haloes[i]*1.,3)*pow(radial_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+             I33_w_data_will+=Area*pow(radial_all_weight_cell[i]/radial_cell[i]*1.,3)*pow(radial_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ),3)*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
    
 //Shot noise of the Bispectrum
-                        IN2+=Area*pow(radial_fkp_cell_haloes[i]/radial_cell_haloes[i]*1.,3)*(radial_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*(radial_weight_cell_haloesN2[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+                        IN2+=Area*pow(radial_fkp_cell[i]/radial_cell[i]*1.,3)*(radial_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*(radial_weight_cell_N2[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
-                        IN1+=Area*pow(radial_fkp_cell_haloes[i]/radial_cell_haloes[i]*1.,3)*(radial_weight_cell_haloes[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*(radial_weight_cell_haloesN1[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
+                        IN1+=Area*pow(radial_fkp_cell[i]/radial_cell[i]*1.,3)*(radial_weight_cell[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*(radial_weight_cell_N1[i]*n_bin_r/(r_max-r_min)*1./( (r_min+i*(r_max-r_min)/n_bin_r )*(r_min+i*(r_max-r_min)/n_bin_r)*Area  ))*pow(r_min+i*(r_max-r_min)/n_bin_r,2)*(r_max-r_min)/n_bin_r;
 
 
                 }
         }
 
-free(radial_cell_haloes);
-free(radial_all_weight_cell_haloes);
-free(radial_fkp_cell_haloes);
-free(radial_weight_cell_haloes);
-free(radial_weight_cell_haloesN1);
-free(radial_weight_cell_haloesN2);
+free(radial_cell);
+free(radial_all_weight_cell);
+free(radial_fkp_cell);
+free(radial_weight_cell);
+free(radial_weight_cell_N1);
+free(radial_weight_cell_N2);
 free(z_cell);
 
 
-if(i_DeltaR==1)
+if(i_DeltaR==1)//
 {
 I22_min=I22;
 I22_w_data_min=I22_w_data;
@@ -394,8 +425,8 @@ free(function_parameters);
 parameter_value[3]=npar_used*1.;
 parameter_value[4]=Psn_1a;
 parameter_value[5]=Psn_1b;
-parameter_value[6]=Psn_2;
-parameter_value[7]=zeff/num3*1.;
+parameter_value[6]=normalizationbis;
+parameter_value[7]=zeff/numzeff*1.;
 parameter_value[8]=num2;
 parameter_value[9]=normalization;
 parameter_value[10]=min;
@@ -409,13 +440,17 @@ parameter_value[17]=num;
 parameter_value[18]=I33_min;
 parameter_value[19]=I33_w_data_min;
 parameter_value[20]=I33_w_data_will_min;
-parameter_value[21]=Bsn_1;
-parameter_value[22]=Bsn_2;
+parameter_value[21]=Bsn_1a;
+parameter_value[22]=Bsn_1b;
 parameter_value[23]=IN1_min;
 parameter_value[24]=IN2_min;
 parameter_value[25]=DeltaR_min;
+parameter_value[26]=IN11;
+parameter_value[27]=IN22;
 
 }
+
+
 
 void get_skycuts_write_density_randoms(char *filename, double parameter_value[], double alpha, char *name_den_out)
 {
@@ -432,13 +467,14 @@ double Area=parameter_value[13]*pow(Pi/180.,2);
 double DeltaR=parameter_value[25];
 long int i,npar;
 FILE *f;
-double redshift,weight_fkp, radial,nuissance;
-double *radial_cell,*radial_fkp_cell,*z_cell;
+double redshift,weight_fkp, radial,nuissance,weight_col,weight_sys;
+double *radial_cell,*radial_fkp_cell,*z_cell,*radial_weight_cell,*radial_all_weight_cell;
 double r_min,r_max;
 long int n_bin_r;
 long int index_radial;
 int veto;
-npar=(int)(parameter_value[3]);
+double params[8];
+npar=(long int)(parameter_value[3]);
 
   MAX[0]=z_min;
   MIN[0]=0;
@@ -449,48 +485,61 @@ npar=(int)(parameter_value[3]);
   n_bin_r=(long int)((r_max-r_min)/DeltaR);
   radial_cell = (double*) calloc(n_bin_r, sizeof(double));
   radial_fkp_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
+  radial_all_weight_cell = (double*) calloc(n_bin_r, sizeof(double));
   z_cell = (double*) calloc(n_bin_r, sizeof(double));
 
+    
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-        fscanf(f,"%*f %*f %lf %lf %*f\n",&redshift, &weight_fkp);veto=1;
-//      fscanf(f,"%*f %*f %lf %lf %*f %*f %d\n",&redshift,&weight_fkp,&veto);//EZmocks
 
-        if(redshift>z_min && redshift<z_max && veto==1)
+get_line(f, params,1);
+
+redshift=params[2];
+weight_fkp=params[3];
+weight_col=params[5];
+weight_sys=params[6];
+veto=(int)(params[7]);
+
+
+        if(redshift>z_min && redshift<z_max && veto==1 && weight_col>0)
         {
             MAX[0]=redshift;
             MIN[0]=0;
             adapt_integrate(1, z_to_r , function_parameters, 1, MIN, MAX ,100000, 1e-6, 1e-6, &radial, &nuissance);
 
  index_radial=(long int)(n_bin_r*(radial-r_min)/(r_max-r_min));
-      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld)\n",radial,redshift,r_min,r_max,i);}
-      radial_cell[index_radial]+=1.;
-      radial_fkp_cell[index_radial]+=weight_fkp;
-      z_cell[index_radial]+=redshift;
-
+      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins randoms1 (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld) %ld %lf\n",radial,redshift,r_min,r_max,i,n_bin_r,DeltaR);}
+  
+            radial_cell[index_radial]+=1.;
+            radial_fkp_cell[index_radial]+=weight_fkp;
+            radial_weight_cell[index_radial]+=weight_col*weight_sys;
+            radial_all_weight_cell[index_radial]+=weight_col*weight_sys*weight_fkp;
+            z_cell[index_radial]+=redshift;
+            
         }
-
+    
 }
-
-         printf("\nWriting %s...",name_den_out);
-         f=fopen(name_den_out,"w");
-        fprintf(f,"#Interval: %lf Mpc/h\n",DeltaR);
-        fprintf(f,"# alpha<ns> alpha<wfkp ns>\n");
-        for(i=0;i<n_bin_r;i++)
-        {
-                if(radial_cell[i]!=0)
-                {
-                        z_cell[i]=z_cell[i]/radial_cell[i];
-                        fprintf(f,"%lf %.16lf %.16lf \n",z_cell[i], radial_cell[i]*1.*alpha/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.), radial_fkp_cell[i]*1.*alpha/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.));
-                }
-        }
-        fclose(f);
+    printf("\nWriting %s...",name_den_out);
+    f=fopen(name_den_out,"w");
+    if(f==NULL){printf("File %s could not be created. Exiting now...\n",name_den_out);exit(0);}
+fprintf(f,"#Interval: %lf Mpc/h\n",DeltaR);
+fprintf(f,"# z <nobs> <wc nobs> <wc wfkp nobs>\n");
+for(i=0;i<n_bin_r;i++)
+{
+    if(radial_cell[i]!=0)
+    {
+        z_cell[i]=z_cell[i]/radial_cell[i];
+        fprintf(f,"%lf %.16lf %.16lf %.16lf\n",z_cell[i],radial_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.),  radial_weight_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.), radial_all_weight_cell[i]/(Area*pow(r_min+i*(r_max-r_min)/n_bin_r*1.,2)*(r_max-r_min)/n_bin_r*1.) );
+    }
+}
+fclose(f);
 printf("Ok!\n");
-
-
 free(radial_cell);
+free(radial_all_weight_cell);
 free(radial_fkp_cell);
+free(radial_weight_cell);
 free(z_cell);
 free(function_parameters);
 }
@@ -512,14 +561,14 @@ double Area=parameter_value[13]*pow(Pi/180.,2);
 
 long int i,npar;
 FILE *f;
-double RA,dec,redshift,weight_fkp,n_z,theta, radial,nuissance,max,min;
-npar=(int)(parameter_value[3]);
+double RA,dec,redshift,weight_fkp,weight_col,weight_sys,n_z,theta, radial,nuissance,max,min;
+npar=(long int)(parameter_value[3]);
 
-double normalization;
-double zeff;
+double normalization,normalizationbis;
+double zeff,num,num2,numeff;
 long int npar_used;
 double alpha_data;
-double alpha;//alpha count from data
+double alpha;
 
 double I22_w_randoms;
 double I33_w_randoms;
@@ -531,9 +580,11 @@ double r_min,r_max;
 int i_DeltaR;
 double I22_w_randoms_min;
 double I33_w_randoms_min;
-double numwfkp;
 long int n_bin_r;
 int veto;
+double Psn_2a,Psn_2b,Bsn_2a,Bsn_2b;
+double params[8];
+    
 I22_w_randoms_min=0;
 I33_w_randoms_min=0;
 
@@ -549,8 +600,11 @@ i_DeltaR=0;
 do
 {
 normalization=0;
+normalizationbis=0;
 zeff=0;
-numwfkp=0;
+num=0;
+num2=0;
+numeff=0;
 npar_used=0;
 alpha_data=0;
 alpha=parameter_value[12];
@@ -564,19 +618,37 @@ DeltaR=i_DeltaR*0.5;
   radial_fkp_cell = (double*) calloc(n_bin_r, sizeof(double));
   max=-9999999;
   min=9999999;
+    Psn_2a=0;
+    Psn_2b=0;
+    Bsn_2a=0;
+    Bsn_2b=0;
 f=fopen(filename,"r");
 for(i=0;i<npar;i++)
 {
-	fscanf(f,"%lf %lf %lf %lf %lf\n", &RA, &dec, &redshift, &weight_fkp, &n_z);veto=1;
-//        fscanf(f,"%lf %lf %lf %lf %*f %lf %d\n",&RA,&dec,&redshift,&weight_fkp,&n_z,&veto);//EZmocks
+
+get_line(f, params,1);
+
+RA=params[0];
+dec=params[1];
+redshift=params[2];
+weight_fkp=params[3];
+n_z=params[4];
+weight_col=params[5];
+weight_sys=params[6];
+veto=(int)(params[7]);
+
 
 	theta=90.-dec;
-	if(redshift>z_min && redshift<z_max && veto==1)
+	if(redshift>z_min && redshift<z_max && veto==1 && weight_col>0)
 		  {
 
-		    normalization+=n_z*weight_fkp*weight_fkp;//effective normalization from data. Factor I22
-          	zeff+=redshift*weight_fkp;//Effective redshift
-                numwfkp+=weight_fkp;
+              normalization+=n_z*weight_fkp*weight_fkp*weight_sys*weight_col;//effective normalization from data. Factor I22
+              normalizationbis+=n_z*n_z*weight_fkp*weight_fkp*weight_fkp*weight_sys*weight_col;//effective normalization from data. Factor I22
+              zeff+=redshift*pow(weight_col*weight_sys*weight_fkp,2);
+              num+=weight_col*weight_sys;//Effective number of objects with wsys (real number)
+              numeff+=pow(weight_col*weight_sys*weight_fkp,2);//Effective number of objects with wsys (real number)
+              num2+=weight_col;//Effective number of objects without wsys
+              
 			//From deg to rad
 			RA=RA*Pi/180.;
 			dec=dec*Pi/180.;
@@ -593,13 +665,11 @@ for(i=0;i<npar;i++)
 		   pos_z[npar_used]=radial*cos(theta);
 
       index_radial=(long int)(n_bin_r*(radial-r_min)/(r_max-r_min));
-      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld)\n",radial,redshift,r_min,r_max,i);}
+      if( index_radial<0 || index_radial>n_bin_r-1){printf("error bins randoms2 (radial) radial=%lf (z=%lf)  (%lf,%lf) (line=%ld) %ld %lf\n",radial,redshift,r_min,r_max,i,n_bin_r,DeltaR);}
       radial_cell[index_radial]+=1.;
       radial_fkp_cell[index_radial]+=weight_fkp;
 
-           weight[npar_used]=weight_fkp;//total weight
-//           if(npar_used<6){printf("%lf %lf %lf %lf\n",pos_x[npar_used],pos_y[npar_used],pos_z[npar_used],weight[npar_used]);}
-
+              weight[npar_used]=weight_fkp*weight_col*weight_sys;
 
 		    if(pos_x[npar_used]>max || npar_used==0){max=pos_x[npar_used];}
 			if(pos_y[npar_used]>max){max=pos_y[npar_used];}
@@ -608,16 +678,18 @@ for(i=0;i<npar;i++)
 			if(pos_y[npar_used]<min){min=pos_y[npar_used];}
 			if(pos_z[npar_used]<min){min=pos_z[npar_used];}
 
-			alpha_data+=weight_fkp;
-		
+			alpha_data+=weight_fkp*weight_col*weight_sys;
+            Psn_2a+=pow(weight_fkp*weight_col*weight_sys,2);//false pairs
+            Psn_2b+=weight_fkp*weight_col*weight_sys*weight_fkp*weight_sys;// true pairs
+            Bsn_2a+=pow(weight_fkp*weight_col*weight_sys,3);//false pairs
+            Bsn_2b+=pow(weight_fkp*weight_sys,3)*weight_col;//true pairs
 
 					    npar_used++;
-                               //printf("%ld %lf %lf %.20lf\n",npar_used,RA,dec, redshift);              
 						  }
 
 	  }
 fclose(f);
-alpha*=1./alpha_data;//printf("\n %lf \n",alpha);
+alpha*=1./alpha_data;
 I22_w_randoms=0;
 I33_w_randoms=0;
 
@@ -651,7 +723,12 @@ if(strcmp(type_normalization_mode, "area") == 0 && strcmp(type_normalization_mod
 
 //Copy needed information 
 parameter_value[3]=npar_used*1.;
-parameter_value[7]=zeff/numwfkp*1.;
+parameter_value[4]=Psn_2a;
+parameter_value[5]=Psn_2b;
+parameter_value[6]=normalizationbis;
+parameter_value[7]=zeff/numeff*1.;
+parameter_value[8]=num2;
+parameter_value[20]=num;
 parameter_value[9]=normalization;
 parameter_value[10]=min;
 parameter_value[11]=max;
@@ -665,9 +742,11 @@ parameter_value[17]=I33_w_randoms_min;
 parameter_value[18]=I33_w_randoms_min;
 parameter_value[19]=I33_w_randoms_min;
 parameter_value[25]=DeltaR_min;
+    
+parameter_value[21]=Bsn_2a;
+parameter_value[22]=Bsn_2b;
 
 free(function_parameters);
-//free(f);
 }
 
 
@@ -675,12 +754,19 @@ void get_periodic_data(char *filename_data, double pos_x[], double pos_y[], doub
 {
 long int i,npar;
 double max,min;
+double params[4];
 FILE *f;
 npar=(int)(parameter_value[3]);
 f=fopen(filename_data,"r");
 for(i=0;i<npar;i++)
 {
-fscanf(f,"%lf %lf %lf %lf\n", &pos_x[i], &pos_y[i], &pos_z[i], &weight[i]);
+
+get_line_periodic(f, params);
+pos_x[i]=params[0];
+pos_y[i]=params[1];
+pos_z[i]=params[2];
+weight[i]=params[3];
+
 
       if(pos_x[i]>max || i==0){max=pos_x[i];}
       if(pos_y[i]>max){max=pos_y[i];}
@@ -693,5 +779,5 @@ fscanf(f,"%lf %lf %lf %lf\n", &pos_x[i], &pos_y[i], &pos_z[i], &weight[i]);
 fclose(f);
 parameter_value[10]=min;
 parameter_value[11]=max;
-//free(f);
 }
+

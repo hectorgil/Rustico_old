@@ -1,8 +1,10 @@
 /*
-RUSTICO   Rapid foUrier STatIstics COde
+RUSTICO: Rapid foUrier STatIstics COde
 Author: Hector Gil Marin
-Date: 1st May 2017
-email: hector.gil.marin@gmail.com or hector.gilmarin@lpnhe.in2p3.fr
+Date: 4th Feb. 2019
+Internal Version: 3.2
+email: hector.gil.marin@gmail.com or hectorgil@icc.ub.edu
+(c) All rights reserved
 */
 #include <math.h>
 #include <stdio.h>
@@ -99,11 +101,11 @@ double Shot_noise_factor;// Factor between 0 and 1. 0 Correspond ....
  //Maximum and minimum values for positions of galaxies and randoms.
   double max,min;
 //Parameters relative to shot noise, effective redshifts, number of particles and normalization
-double Psn_1a, Psn_1b, Psn_2, z_effective_data,I_norm_data,z_effective_rand,I_norm_rand,alpha_data,alpha_rand,alpha,I22,I_norm_data2,I_norm_data3,I_norm_data4, I_norm_rand2,I_norm_rand3,I_norm_rand4;
+double Psn_1a, Psn_1b, Psn_2a,Psn_2b, z_effective_data,I_norm_data,z_effective_rand,I_norm_rand,alpha_data,alpha_rand,alpha,I22,I_norm_data2,I_norm_data3,I_norm_data4, I_norm_rand2,I_norm_rand3,I_norm_rand4;
 double P_shot_noise1,P_shot_noise2,P_shot_noise;
-double Bsn1,Bsn2,IN1,IN2,I3_norm_data2,I3_norm_data3,I3_norm_data4,I3_norm_rand2,I3_norm_rand3,I3_norm_rand4,I33,Bsn,IN;
-double num_effective;
-double num_effective2;
+double Bsn1a,Bsn2a,Bsn1b,Bsn2b,Bsn1,Bsn2,IN1,IN2,IN11,IN22,I3_norm_data,I3_norm_data2,I3_norm_data3,I3_norm_data4,I3_norm_rand,I3_norm_rand2,I3_norm_rand3,I3_norm_rand4,I33,Bsn,IN;
+double num_effective,num_effective_rand;
+double num_effective2,num_effective2_rand;
 
     int n_lines_parallel;//Number of parallel threads
 
@@ -272,12 +274,11 @@ if( strcmp(Hexadecapole_type, "L4") !=0 && strcmp(Hexadecapole_type, "L2L2") !=0
 if( strcmp(type_normalization_mode, "area") !=0 && strcmp(type_normalization_mode, "density") !=0){printf("Error. Normalisation type must be either 'area' or 'density'. Entry read %s. Exiting now...\n",type_normalization_mode);return 0;}
 if( strcmp(type_normalization_mode2, "data") !=0 && strcmp(type_normalization_mode2, "randoms") !=0){printf("Error. Normalisation type must be either 'data' or 'randoms'. Entry read %s. Exiting now...\n",type_normalization_mode2);return 0;}
 if(Shot_noise_factor>1 || Shot_noise_factor<0){printf("Warning. Usual value for the Shot noise factor: %lf. Exiting now...\n",Shot_noise_factor);return 0;}
-if( strcmp(do_bispectrum, "yes") == 0 && strcmp(type_normalization_mode, "density") == 0 ){printf("Warning. Bispectrum computation requires a normalization by 'area' and not by 'density'. Exiting now...\n");return 0;}
 }
 //etc strings.....
 
 //Reading files.
-double parameter_value[26];
+double parameter_value[28];
 parameter_value[0]=Omega_m;
 parameter_value[1]=z_min;
 parameter_value[2]=z_max;
@@ -286,7 +287,7 @@ parameter_value[13]=Area_survey;
 
 if(strcmp(type_of_survey, "cutsky") == 0)
 {
-                Ndata2=get_number_used_lines_data(name_data_in,parameter_value);
+                Ndata2=get_number_used_lines_data(name_data_in,parameter_value);if(Ndata2<1000){printf("Warning, unusual low value for Ndata=%ld\n",Ndata2);}
 }
 if(strcmp(type_of_survey, "periodic") == 0)
 {
@@ -305,7 +306,7 @@ if(strcmp(type_of_survey, "cutsky") == 0)
 {
 //pos_x,pos_y,pos_z,weight are loaded with the position of particles
 //Ndata is uploaded to the number of particles used
-//Psn_1a,Psn_1b,Psn_2 are uploaded with information on the shot noise
+//Psn_1a,Psn_1b,Psn_2a,Psn_2b are uploaded with information on the shot noise
 //z_efffective is uploaded with the effective redshift of the sample
 //num_effective is uploaded with the effective number of particles
 //I_norm is uploaded with information relative to the normalization based on density
@@ -316,7 +317,7 @@ get_skycuts_data(name_data_in, pos_x, pos_y, pos_z, weight, parameter_value,type
 Ndata2=parameter_value[3];
 Psn_1a=parameter_value[4];
 Psn_1b=parameter_value[5];
-Psn_2=parameter_value[6];
+I3_norm_data=parameter_value[6];
 z_effective_data=parameter_value[7];
 num_effective=parameter_value[8];
 I_norm_data=parameter_value[9];
@@ -333,10 +334,12 @@ I3_norm_data2=parameter_value[18];
 I3_norm_data3=parameter_value[19];
 I3_norm_data4=parameter_value[20];
 
-Bsn1=parameter_value[21];
-Bsn2=parameter_value[22];
+Bsn1a=parameter_value[21];
+Bsn1b=parameter_value[22];
 IN1=parameter_value[23];
 IN2=parameter_value[24];
+IN11=parameter_value[26];
+IN22=parameter_value[27];
 
 parameter_value[3]=Ndata;
 sprintf(name_den_out,"%s/Density_galaxies_%s.txt",name_path_out,name_id);
@@ -349,7 +352,7 @@ parameter_value[0]=Omega_m;
 parameter_value[1]=z_min;
 parameter_value[2]=z_max;
 parameter_value[3]=Nrand;
-Nrand2=get_number_used_lines_randoms(name_randoms_in,parameter_value);
+Nrand2=get_number_used_lines_randoms(name_randoms_in,parameter_value);if(Ndata2<1000){printf("Warning, unusual low value for Nrandoms=%ld\n",Nrand2);}
 
         pos_x_rand = (double*) calloc(Nrand2, sizeof(double));
         pos_y_rand = (double*) calloc(Nrand2, sizeof(double));
@@ -361,7 +364,12 @@ parameter_value[12]=alpha_data;
 sprintf(name_den_out,"%s/Density_randoms_%s.txt",name_path_out,name_id);
 get_skycuts_randoms(name_randoms_in, pos_x_rand, pos_y_rand, pos_z_rand, weight_rand, parameter_value,type_normalization_mode, type_normalization_mode2);
 Nrand2=parameter_value[3];
+Psn_2a=parameter_value[4];
+Psn_2b=parameter_value[5];
 z_effective_rand=parameter_value[7];
+num_effective_rand=parameter_value[8];
+num_effective2_rand=parameter_value[20];
+
 if(min>parameter_value[10]){min=parameter_value[10];}
 if(max<parameter_value[11]){max=parameter_value[11];}
 alpha_rand=parameter_value[12];
@@ -371,25 +379,34 @@ I_norm_rand2=parameter_value[14];
 I_norm_rand3=parameter_value[15];
 I_norm_rand4=parameter_value[16];
 
+I3_norm_rand=parameter_value[6];
 I3_norm_rand2=parameter_value[17];
 I3_norm_rand3=parameter_value[18];
 I3_norm_rand4=parameter_value[19];
+    
+    Bsn2a=parameter_value[21];
+    Bsn2b=parameter_value[22];
 
 alpha=alpha_data/alpha_rand;
 I_norm_rand=I_norm_rand*alpha;
+I3_norm_rand=I3_norm_rand*alpha;
 
-if(strcmp(type_normalization_mode2, "randoms") == 0 && strcmp(type_normalization_mode, "density") == 0 ){I22=I_norm_rand;}
-if(strcmp(type_normalization_mode2, "data") == 0 && strcmp(type_normalization_mode, "density") == 0){I22=I_norm_data;}
+    if(strcmp(type_normalization_mode2, "randoms") == 0 && strcmp(type_normalization_mode, "density") == 0 ){I22=I_norm_rand;I33=I3_norm_rand;}
+    if(strcmp(type_normalization_mode2, "data") == 0 && strcmp(type_normalization_mode, "density") == 0){I22=I_norm_data;I33=I3_norm_data;}
 
 if(strcmp(type_normalization_mode2, "randoms") == 0 && strcmp(type_normalization_mode, "area") == 0 ){I22=I_norm_rand2;I33=I3_norm_rand2;}
 if(strcmp(type_normalization_mode2, "data") == 0 && strcmp(type_normalization_mode, "area") == 0){I22=I_norm_data2;I33=I3_norm_data2;}
 
 
-P_shot_noise1=(Psn_1a+alpha*Psn_2)/I22;
-P_shot_noise2=(Psn_1b+alpha*Psn_2)/I22;
+P_shot_noise1=(Psn_1a+alpha*alpha*Psn_2a)/I22;
+P_shot_noise2=(Psn_1b+alpha*alpha*Psn_2b)/I22;
 P_shot_noise=P_shot_noise1*Shot_noise_factor+P_shot_noise2*(1.-Shot_noise_factor);
-Bsn=(Bsn1-alpha*alpha*Bsn2)/I33;
-IN=(IN1*Shot_noise_factor+IN2*(1.-Shot_noise_factor))/I33;
+Bsn1=(Bsn1a-alpha*alpha*alpha*Bsn2a)/I33;
+Bsn2=(Bsn1b-alpha*alpha*alpha*Bsn2b)/I33;
+    
+Bsn=Bsn1*Shot_noise_factor+(1.-Shot_noise_factor)*Bsn2;
+if( strcmp(type_normalization_mode, "area") == 0 ){IN=(IN1*Shot_noise_factor+IN2*(1.-Shot_noise_factor))/I33;}
+if( strcmp(type_normalization_mode, "density") == 0 ){IN=(IN11*Shot_noise_factor+IN22*(1.-Shot_noise_factor))/I33;}
 
 parameter_value[3]=Nrand;
 sprintf(name_den_out,"%s/Density_randoms_%s.txt",name_path_out,name_id);
@@ -429,7 +446,9 @@ if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Random file %s\n",name_ran
 fprintf(f,"#Number of data elements used: %ld\n",Ndata2);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %ld\n",Nrand2);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %lf\n",num_effective);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of random elements weighted by wcol: %lf\n",num_effective_rand);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol*wsys: %lf\n",num_effective2);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of random elements weighted by wcol*wsys: %lf\n",num_effective2_rand);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from data %lf\n",z_effective_data);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from randoms %lf\n",z_effective_rand);}
 fprintf(f,"#Size of the Box %lf Mpc/h\n",L2-L1);
@@ -463,7 +482,9 @@ if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Random file %s\n",name_ran
 fprintf(f,"#Number of data elements used: %ld\n",Ndata2);
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Number of random elements used: %ld\n",Nrand2);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol: %lf\n",num_effective);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of randoms elements weighted by wcol: %lf\n",num_effective_rand);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of data elements weighted by wcol*wsys: %lf\n",num_effective2);}
+if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective number of randoms elements weighted by wcol*wsys: %lf\n",num_effective2_rand);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from data %lf\n",z_effective_data);}
 if(strcmp(type_of_survey, "cutsky") == 0){fprintf(f,"#Effective redshift value from randoms %lf\n",z_effective_rand);}
 fprintf(f,"#Size of the Box %lf Mpc/h\n",L2-L1);
@@ -510,7 +531,7 @@ if(strcmp(type_of_computation, "FFT") == 0 && strcmp(type_of_survey, "cutsky") =
 parameter_value[0]=L1;
 parameter_value[1]=L2;
 check_box_for_yamamoto(parameter_value,ngrid);
-//exit(0);
+
 L1=parameter_value[0];
 L2=parameter_value[1];
 

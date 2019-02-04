@@ -264,7 +264,7 @@ i++;
 }
 }
 free(kx);
-
+//Monopole commented within the exact function in order to speed up the counting code. 
 //monopole_real_rr= (double **)calloc(NGRID,sizeof(double*));
 //monopole_real_gr= (double **)calloc(NGRID,sizeof(double*));
 //monopole_real_gg= (double **)calloc(NGRID,sizeof(double*));
@@ -1392,7 +1392,6 @@ void loop_interlacing_skycut2(double kmin, double kmax, int Ninterlacing, double
 long int i,j,k,i_inter;
 long int c;
 int i_yama_max;
-//i_yama_max;
 double phase_cos,phase_sin;
 double new_deltak_re0_b,new_deltak_im0_b,new_deltak_re2_b,new_deltak_im2_b,new_deltak_re4_b,new_deltak_im4_b;
 int i_yama;
@@ -1729,7 +1728,6 @@ printf("Ok!\n");
 
 if(i_inter==Ninterlacing && strcmp(do_bispectrum, "no") == 0)
 {
-//printf("positions freed\n");
 free(pos_x);
 free(pos_y);
 free(pos_z);
@@ -1949,7 +1947,6 @@ for(i_inter=1;i_inter<=Ninterlacing;i_inter++)
 
 if(i_inter==Ninterlacing && strcmp(do_bispectrum, "no") == 0 )//only free them in the last interation and if no-bispectrum is computed
 {
-//printf("positions freed\n");
 free(pos_x);
 free(pos_y);
 free(pos_z);
@@ -2252,7 +2249,7 @@ printf("Ok!\n");
 
 }
 
-}//end of itteration loop
+}//end of iteration loop
 free(kx);
 
 params_input[0]=pow(L2-L1,3)/Ndata;

@@ -53,6 +53,44 @@ if(ch != '\n' && number_of_lines != 0)
 
 void check_box_for_yamamoto(double *parameters, int ngrid)
 {
+double L1,L2;
+int warning;
+double vector;
+int vector_i;
+double epsilon,deltaepsilon,L1old,L2old;
+int j;
+
+L1old=parameters[0];
+L2old=parameters[1];
+L1=L1old;
+L2=L2old;
+deltaepsilon=(L2-L1)/ngrid*1.*0.001;//0.1 percent of gridcell
+j=0;
+warning=0;
+do
+{
+warning=0;
+epsilon=epsilon+j*deltaepsilon;
+
+vector=-L1*ngrid/(L2-L1);
+vector_i=(int)(vector);
+
+if(vector==vector_i*1.){warning=-1;}
+
+L1=L1+epsilon;
+L2=L2+epsilon;
+j++;
+}while(warning==-1);
+
+if(L1!=L1old){printf("Box displaced by %lf (iterated %d times) from (L1,L2)=(%lf, %lf) to (%lf, %lf) for better performance\n",epsilon,j,L1old,L2old,L1,L2);}
+parameters[0]=L1;
+parameters[1]=L2;
+
+
+}
+
+void check_box_for_yamamoto_old(double *parameters, int ngrid)
+{
 //printf("%lf %lf %d\n",parameters[0],parameters[1],ngrid);
 int i,j;
 int warning;
@@ -69,7 +107,8 @@ deltaepsilon=(L2-L1)/ngrid*1.*0.001;//0.1 percent of gridcell
 do
 {
 warning=0;
-epsilon+=j*deltaepsilon;
+//epsilon+=j*deltaepsilon;
+epsilon=epsilon+j*deltaepsilon;
 //printf("j=%d, epsilon=%lf\n",j,epsilon);
 for(i=0;i<ngrid;i++)
 {
@@ -77,8 +116,10 @@ l=L1+i*(L2-L1)/ngrid*1.;
 //printf("i=%d, l=%lf\n",i,l);
 if(l==0){warning=-1;break;}
 }
-L1+=epsilon;
-L2+=epsilon;
+//L1+=epsilon;
+//L2+=epsilon;
+L1=L1+epsilon;
+L2=L2+epsilon;
 j++;
 }while(warning==-1);
 

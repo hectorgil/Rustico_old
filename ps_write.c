@@ -414,7 +414,7 @@ freeTokensLInt(nmodes,Nk);
 }
 
 void write_power_spectrum_skyscuts_L2L2(double kmin, double kmax, double deltak_re0[], double deltak_im0[], double deltak_re2[], double deltak_im2[], double Deltak, int ngrid, double L1, double L2, double I22, int N_interlacing, char *name_ps_out, double P_shot_noise, char *binning_type)
-{//printf("hola ke ase\n");
+{
 double Pi=(4.*atan(1.));
 double **K;
 double **k_av;
@@ -480,7 +480,6 @@ if(bintype_sw==1){Nk=(int)((log10(sqrt(3.)*2.*Pi*ngrid/(2.*(L2-L1)))-log10(2.*Pi
                 K[l] = (double*)calloc(nthreads,sizeof(double));
                 k_av[l] = (double*)calloc(nthreads,sizeof(double));
         }
-
 #pragma  omp parallel for private(index2,l2,i,j,k,l,tid,i2,k2,j2,keff,kmineff) shared(ngrid,ngridtot,kx,Deltak,Nk,K,deltak_re0,deltak_im0,deltak_re2,deltak_im2,nmodes,Mono,Quadru,Hexadeca,N_interlacing,kmin,bintype_sw)
         for(l2=0;l2<ngridtot;l2++)
         {
@@ -541,8 +540,9 @@ Hexadeca[l][tid]+=315./8.*(pow(deltak_re2[index2]/N_interlacing*1.,2)+pow(deltak
 }
 
 }
-              }
+               }
       }
+
 
 for(l=0;l<Nk;l++)
 {

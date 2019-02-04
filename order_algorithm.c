@@ -47,7 +47,7 @@ fclose(f);
 system("sort -k2 -n temp.dat > temp2.dat");
 system("rm temp.dat");
 
-sprintf(name,"temp%d.dat",ngrid);
+sprintf(name,"wisdom%d.dat",ngrid);
 
 f=fopen("temp2.dat","r");
 g=fopen(name,"w");

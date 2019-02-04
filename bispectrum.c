@@ -451,7 +451,7 @@ Power2 = (double*)malloc((n_lines_parallel)*sizeof(double));
 Power3 = (double*)malloc((n_lines_parallel)*sizeof(double));
 
 
-sprintf(name_of_order_file,"temp%d.dat",ngrid);
+sprintf(name_of_order_file,"wisdom%d.dat",ngrid);
 
 
 f=fopen(name_of_order_file,"r");
@@ -728,14 +728,6 @@ Q=B/(P1*P2+P1*P3+P2*P3);
 fprintf(f,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",K_eff1, K1[i1], K_eff2,  K2[i1][i2], K_eff3, K3[i1][i2][i3],B, B_shot_noise,Q,Q_shot_noise, Number_triangles);
 bin++;
 
-//printf("aaaaA");
-//if(K1[i1]==K2[i1][i2] && K1[i1]==K3[i1][i2][i3])
-//{  
-//printf("%lf %lf %lf %lf %lf %e %lf %lf \n", K_eff1, K_eff2, K_eff3,B,B_shot_noise, Number_triangles,P1,Psn);
-//fprintf(g,"%lf %lf %lf %lf %lf %lf %lf\n", K_eff1, K_eff2, K_eff3,B,B_shot_noise, Number_triangles,P1);
-//bin++;
-//}
-
 free(out_k3);
 if(strcmp(triangles_num, "APR_SUM") == 0 || strcmp(write_triangles, "yes") == 0)
 {
@@ -766,11 +758,12 @@ if(strcmp(triangles_num, "FFT") == 0){free(out_k1_NT);}
 free(L);
 free(IJK);
 free(Power);
+free(Power1);
+free(Power2);
+free(Power3);
 if(strcmp(triangles_num, "FFT") == 0){free(Number);}
 
 input_bin[0]=bin;
-//printf("finish");
-//exit(0);
 }
 
         
