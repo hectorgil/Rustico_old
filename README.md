@@ -1,19 +1,27 @@
-RUSTICO   Rapid foUrier STatIstics COde
-
+RUSTICO: Rapid foUrier STatIstics COde
 Author: Hector Gil Marin
-
-Release Date: 1st May 2017
-General update with minor bugs: 26th Oct 2018
-
+Date: 4th Feb. 2019
+Internal Version: 3.2
 email: hector.gil.marin@gmail.com or hectorgil@icc.ub.edu
+(c) All rights reserved
 
-====Compilation====
+====Compilation Examples====
 
-icc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positions.c cubature.c ps_write.c order_algorithm.c -O3   -lm -openmp -lfftw3_omp  -lfftw3 -lm -I/users/hectorgm/fftw3_threads/include/ -L/users/hectorgm/fftw3_threads/lib/ -o file.out
+icc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positions.c read_line.c cubature.c ps_write.c order_algorithm.c -O3 -lm -openmp -lfftw3_omp  -lfftw3 -lpthread -lfftw3_threads -I/users/hectorgm/fftw3_threads/include/ -L/users/hectorgm/fftw3_threads/lib/ -o file_icc.out
+
+gcc main.c bispectrum.c functions.c mass_assignment.c fftw_compute.c read_positions.c read_line.c cubature.c ps_write.c order_algorithm.c -O3 -std=c99 -lm -fopenmp -lfftw3_omp  -lfftw3 -lpthread -lfftw3_threads -I/users/hectorgm/fftw3_threads_gcctest/include -L/users/hectorgm/fftw3_threads_gcctest/lib/ -o file_gcc.out
+
+you will need to have the FFTW libraries installed with the following option in the configure file,
+
+./configure  --enable-openmp --enable-threads  --prefix="/home/hector/fftw3_threads/" CC="gcc"
+
+where CC="icc" in case you use the intel compiler. 
+
+and provide the link to the lib and include paths in case they are not install authomatically in the root path. 
 
 ====Run====
 
-./file.out param_file.txt
+./file_icc.out param_file.txt
 
 ====Parameter file options====
 
@@ -83,67 +91,6 @@ Do Multigrid (yes/no): Option for the bispectrum computation. If enable, the bis
 
 #Compute Shot noise as (double): Shot noise factor parameter. See. Gil-Marin et al. 2014 Eq. ..... Only for skycut option
 
-====Ascii File Structure=====
-
-For 'periodic' option: 4-column entry
-
-x-position (double), y-position (double), z-position (double), weight (double)
-
-For example,
-
-2.234479 8.066518 6.439348 1.0
-
-1.406139 5.003024 3.664719 1.0
-
-9.559097 7.672305 10.529753 1.0
-
-16.126962 1.955036 1.807368 1.0
-
-13.377709 2.506474 2.225270 1.0
-
-11.555976 0.431673 3.149166 1.0
-
-14.122240 16.198794 3.532218 1.0
-
-14.214268 14.341477 4.141918 1.0
-
-For 'skycut' option: data and random entry required
-
-#data. 8-column entry:
-
-Right Ascension (double), declination (double), redshift (double), weight_fkp (double), weight_colision (integer), weight_systematics (double), number_density (double), veto (integer)
-
-For example
-
-1.291761884477e+02 4.894649924515e+01 5.425299000000e-01 1.238355000000e-01 1 1.029931000000e+00 7.075228831797e-04 1
-
-1.174169630420e+02 3.927675925314e+01 3.996815000000e-01 6.395705000000e-01 1 1.020382000000e+00 5.635492881551e-05 1
-
-1.169127239443e+02 3.944331088030e+01 5.377024000000e-01 1.231396000000e-01 1 9.972784000000e-01 7.120864449779e-04 0
-
-1.169501719710e+02 3.949076919700e+01 5.191724000000e-01 1.143980000000e-01 1 1.061827000000e+00 7.741411563139e-04 1
-
-1.175284705313e+02 4.017649329509e+01 5.431913000000e-01 1.246438000000e-01 1 1.022436000000e+00 7.022861947405e-04 1
-
-1.238161587640e+02 4.663678411199e+01 5.896081000000e-01 1.800036000000e-01 1 1.009149000000e+00 4.555444446667e-04 1
-
-1.276012766986e+02 4.977593704841e+01 5.481966000000e-01 1.309460000000e-01 1 1.053429000000e+00 6.636735753669e-04 1
-
-#randoms. 6-column entry:
-
-Right Ascension (double), declination (double), redshift (double), weight_fkp (double), number_density (double), veto (int)
-
-For example
-
-1.350240900000e+02 4.260718600000e+01 6.651101708412e-01 3.819904327393e-01 8.089333060371e-03 1
-
-1.849009090000e+02 5.155070000000e+01 4.627352356911e-01 1.447689384222e-01 2.953779556923e-02 1
-
-2.178783680000e+02 1.166351500000e+01 4.882844388485e-01 1.163647100329e-01 3.796835353765e-02 1
-
-1.413639550000e+02 5.575799200000e+01 5.019413828850e-01 1.094641387463e-01 4.067705969521e-02 0
-
-2.276985360000e+02 1.560757100000e+01 5.646098852158e-01 1.411796659231e-01 3.041586507737e-02 1
 
 ====Output Structure====
 
@@ -175,4 +122,4 @@ If you use this code for your published or unpublished work, please refer it to 
 
 ====Disclaimer====
 
-blah blah blah
+....
